@@ -1,0 +1,66 @@
+frontend-1  | 
+frontend-1  | > frontend@0.1.0 dev
+frontend-1  | > next dev --turbopack
+frontend-1  | 
+frontend-1  |    ▲ Next.js 15.3.3 (Turbopack)
+frontend-1  |    - Local:        http://localhost:3000
+frontend-1  |    - Network:      http://172.18.0.3:3000
+frontend-1  | 
+frontend-1  |  ✓ Starting...
+frontend-1  |  ✓ Ready in 1184ms
+frontend-1  |  ○ Compiling /api/health ...
+frontend-1  |  ✓ Compiled /api/health in 1210ms
+frontend-1  |  GET /api/health 200 in 1385ms
+frontend-1  |  GET /api/health 200 in 54ms
+frontend-1  |  GET /api/health 200 in 42ms
+frontend-1  |  GET /api/health 200 in 43ms
+frontend-1  |  GET /api/health 200 in 50ms
+frontend-1  |  GET /api/health 200 in 36ms
+frontend-1  |  GET /api/health 200 in 36ms
+frontend-1  |  GET /api/health 200 in 33ms
+frontend-1  |  ○ Compiling / ...
+frontend-1  |  ✓ Compiled / in 1857ms
+frontend-1  |  ○ Compiling /_error ...
+frontend-1  |  ✓ Compiled /_error in 2.4s
+frontend-1  |  GET / 500 in 4917ms
+frontend-1  |  GET /api/health 200 in 60ms
+frontend-1  |  ○ Compiling /favicon.ico ...
+frontend-1  |  ✓ Compiled /favicon.ico in 1370ms
+frontend-1  |  GET /favicon.ico 200 in 1672ms
+frontend-1  |  GET /api/health 200 in 80ms
+frontend-1  |  GET /api/health 200 in 40ms
+frontend-1  |  GET /api/health 200 in 43ms
+frontend-1  |  GET /api/health 200 in 40ms
+frontend-1  |  GET /api/health 200 in 50ms
+frontend-1  |  GET /api/health 200 in 72ms
+frontend-1  |  GET /api/health 200 in 41ms
+frontend-1  |  GET /api/health 200 in 41ms
+frontend-1  |  GET /api/health 200 in 46ms
+frontend-1  |  GET /api/health 200 in 41ms
+frontend-1  |  GET /api/health 200 in 44ms
+frontend-1  |  GET /api/health 200 in 47ms
+frontend-1  |  GET /api/health 200 in 65ms
+frontend-1  |  GET /api/health 200 in 53ms
+frontend-1  |  GET /api/health 200 in 41ms
+frontend-1  |  GET /api/health 200 in 48ms
+frontend-1  |  GET /api/health 200 in 44ms
+frontend-1  |  GET /api/health 200 in 49ms
+frontend-1  |  GET /api/health 200 in 24ms
+frontend-1  |  GET /api/health 200 in 38ms
+frontend-1  |  GET /api/health 200 in 59ms
+frontend-1  |  GET /api/health 200 in 44ms
+frontend-1  |  GET /api/health 200 in 43ms
+frontend-1  |  GET /api/health 200 in 46ms
+frontend-1  |  GET /api/health 200 in 47ms
+frontend-1  |  GET /api/health 200 in 41ms
+frontend-1  |  GET /api/health 200 in 40ms
+frontend-1  |  GET /api/health 200 in 65ms
+frontend-1  |  GET /api/health 200 in 45ms
+frontend-1  |  GET /api/health 200 in 43ms
+frontend-1  |  GET /api/health 200 in 44ms
+frontend-1  |  GET /api/health 200 in 63ms
+frontend-1  |  GET /api/health 200 in 52ms
+frontend-1  |  GET /api/health 200 in 46ms
+frontend-1  |  GET /api/health 200 in 46ms
+frontend-1  |  GET /api/health 200 in 45ms
+frontend-1  |  GET /api/health 200 in 43ms
