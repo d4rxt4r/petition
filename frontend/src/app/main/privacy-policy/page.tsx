@@ -1,6 +1,6 @@
 export default function PrivacyPolicy() {
     return (
-        <section className="px-4 md:px-0 md:w-7xl m-auto flex flex-col py-10">
+        <section className="px-4 max-w-7xl m-auto flex flex-col py-10">
             <h1 className="text-3xl md:text-6xl font-semibold mb-5 md:mb-10">
                 Политика конфиденциальности
             </h1>

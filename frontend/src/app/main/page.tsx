@@ -5,7 +5,7 @@ import { SignCounter } from '@/components/SignCounter';
 export default function MainPage() {
     return (
         <>
-            <section id="jumbo" className="px-4 md:px-0 flex items-center md:m-auto md:w-7xl md:min-h-[calc(100vh-68px)]">
+            <section id="jumbo" className="px-4 flex items-center m-auto max-w-7xl md:min-h-[calc(100vh-68px)]">
                 <div className="flex flex-col md:flex-row gap-12">
                     <div className="basis-1/2 shrink-0 pt-14 flex flex-col">
                         <h1 className="text-3xl md:text-6xl font-semibold mb-4 md:mb-10">
@@ -28,7 +28,7 @@ export default function MainPage() {
                 </div>
             </section>
 
-            <main id="petition" className="px-4 md:px-0 md:w-7xl m-auto md:text-2xl mb-16">
+            <main id="petition" className="px-4 max-w-7xl m-auto md:text-2xl mb-16">
                 <h2 className="text-3xl md:text-6xl font-semibold mb-5 md:mb-10 pt-10">
                     Текст петиции
                 </h2>
@@ -77,12 +77,12 @@ export default function MainPage() {
                     г. Омск, г. Тюмень, г. Самара, г. Нижний Новгород, г. Ростов-на-Дону,
                     г. Ставрополь, г. Краснодар, г. Волгоград и г. Ярославль.
                 </p>
-                <div className="flex gap-8">
-                    <div className="basis-1/2 shrink-0 flex flex-col gap-2">
+                <div className="flex gap-6">
+                    <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
                         <span className="font-semibold">Адресат</span>
                         <p>Парламент Республики Молдова</p>
                     </div>
-                    <div className="basis-1/2 shrink-0 flex flex-col gap-2">
+                    <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
                         <span className="font-semibold">Автор</span>
                         <p>Иван Иванов</p>
                     </div>
@@ -90,14 +90,14 @@ export default function MainPage() {
             </main>
 
             <section id="attention" className="py-12 bg-linear-to-t from-[#1A2B87] to-[#4155C7]">
-                <h3 className="text-white text-2xl md:text-4xl px-4 md:px-0 md:w-7xl m-auto md:leading-[50px]">
+                <h3 className="text-white text-2xl md:text-4xl px-4 max-w-7xl m-auto md:leading-[50px]">
                     Призываем мировое сообщество и руководство Республики Молдова обеспечить нам конституционное избирательное право и не допустить дискриминацию молдаван России на выборах депутатов в парламент Республики Молдовы 28 сентября 2025 года
                 </h3>
             </section>
 
-            <section id="petition-form" className="px-4 md:px-0 md:w-7xl m-auto py-14 md:py-[100px]">
+            <section id="petition-form" className="px-4 w-full max-w-7xl m-auto py-14 md:py-[100px]">
                 <div className="flex gap-14">
-                    <div className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-14">
+                    <div className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
                         <div className="text-3xl md:text-5xl font-semibold mb-12">
                             Форма подписания
                         </div>
@@ -118,10 +118,10 @@ export default function MainPage() {
                     </div>
 
                     <div className="hidden md:flex shrink-0 bg-[#F2F2F2] rounded-2xl relative flex-col justify-end w-[380px] overflow-hidden">
-                        <SignCounter className="absolute top-[50]" />
+                        <SignCounter className="absolute top-[50] z-10" />
 
                         <div className="text-white bg-linear-to-t from-[#1A2B87] to-[#4155C7] pt-[330px] p-6">
-                            <Image src="/img/form.png" className="absolute bottom-0 left-0 right-0 z-0" alt="form" width={380} height={575} />
+                            <Image src="/img/form.svg" className="absolute bottom-0 left-0 right-0 z-0" alt="form" width={380} height={600} />
                             <div className="relative z-10 pb-4">
                                 Поделиться в
                             </div>
@@ -144,7 +144,7 @@ export default function MainPage() {
                 </div>
             </section>
 
-            <section id="how-it-works" className="px-4 md:px-0 md:w-7xl m-auto pb-14 md:pb-[100px]">
+            <section id="how-it-works" className="px-4 max-w-7xl m-auto pb-14 md:pb-[100px]">
                 <div className="text-4xl md:text-5xl font-semibold mb-7 md:mb-14">
                     Как работает подписание?
                 </div>

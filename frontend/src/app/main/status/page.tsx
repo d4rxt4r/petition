@@ -1,20 +1,7 @@
 import Image from 'next/image';
 import { SignCounter } from '@/components/SignCounter';
+import { PetitionStatus, StatusText } from '@/enums';
 import { cn } from '@/lib/utils';
-
-enum PetitionStatus {
-    ACTIVE,
-    PENDING,
-    SIGNED,
-    REJECTED,
-}
-
-const StatusText = {
-    [PetitionStatus.ACTIVE]: 'Сбор подписей — важный этап продвижения петиции. Он показывает, сколько людей поддерживают инициативу. Подписи можно собирать как в электронном виде, так и на бумаге. Чем больше подписей — тем выше шанс, что петицию рассмотрят и примут меры',
-    [PetitionStatus.PENDING]: 'После отправки на согласование петиция проходит проверку на  соответствие требованиям. Затем её рассматривают ответственные органы, которые могут одобрить, отклонить или вернуть на доработку. Статус петиции можно отслеживать на сайте.',
-    [PetitionStatus.SIGNED]: 'Принятие петиции означает, что она прошла все этапы рассмотрения и была одобрена ответственными органами. Это может привести к началу разработки законопроекта, изменению правил или другим действиям в ответ на поднятую проблему.',
-    [PetitionStatus.REJECTED]: 'Если петиция не была принята, это означает, что по результатам рассмотрения компетентные органы не поддержали инициативу. Официальный ответ властей можно посмотреть по ссылке.',
-};
 
 interface PetitionStatusProps {
     status: PetitionStatus;
@@ -70,7 +57,7 @@ export default function StatusPage() {
     const status = PetitionStatus.ACTIVE;
 
     return (
-        <section className="py-10 px-4 md:px-0 md:w-7xl m-auto flex flex-col md:flex-row min-h-[calc(100vh-190px)] items-center">
+        <section className="py-10 px-4 max-w-7xl m-auto flex flex-col md:flex-row min-h-[calc(100vh-190px)] items-center">
             <PetitionStatusDisplay status={status} />
             <div className="md:hidden w-full mt-4">
                 <SignCounter invert />

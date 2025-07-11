@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function ThankYouPage() {
     return (
-        <section className="px-4 md:px-0 md:w-7xl m-auto flex min-h-[calc(100vh-190px)] items-center">
+        <section className="px-4 max-w-7xl m-auto flex min-h-[calc(100vh-190px)] items-center">
             <div className="flex flex-col md:flex-row gap-12">
                 <div className="basis-1/2 shrink-0 pt-14 flex flex-col">
                     <h1 className="text-3xl text-center md:text-start md:text-6xl font-semibold md:mb-10">
