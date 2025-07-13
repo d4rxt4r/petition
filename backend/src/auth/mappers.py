@@ -1,6 +1,6 @@
 from src.auth.models import Admin
-from src.auth.schemas import UserRead
+from src.auth.schemas import AdminRead
 
 
-def user_to_read(user: Admin) -> UserRead:
-    return UserRead.model_validate(user)
+def admin_to_read(user: Admin) -> AdminRead:
+    return AdminRead.model_validate(user)

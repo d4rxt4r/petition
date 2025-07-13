@@ -1,8 +1,3 @@
-"""
-Парольные хелперы на базе pwdlib 0.2+
-argon2id — основной, bcrypt — резервный (для миграции старых хешей).
-"""
-
 from typing import Any
 from pwdlib import PasswordHash
 from argon2.exceptions import (

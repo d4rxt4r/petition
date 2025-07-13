@@ -6,7 +6,7 @@ class LoginForm(BaseModel):
     password: str
 
 
-class UserRead(BaseModel):
+class AdminRead(BaseModel):
     email: EmailStr
 
     model_config = ConfigDict(from_attributes=True)

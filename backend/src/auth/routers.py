@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
 from src.auth.schemas import (
     LoginForm,
-    UserRead,
+    AdminRead,
 )
 from src.auth.models import Admin
 from src.auth.utils.passwords import verify_password
@@ -61,11 +61,11 @@ async def logout(response: Response) -> None:
     auth.unset_refresh_cookies(response)
 
 
-@router.get("/users", response_model=UserRead, summary="Текущий пользователь")
+@router.get("/users", response_model=AdminRead, summary="Текущий пользователь")
 async def get_user(
     db_session: DBSessionDep,
     payload: AuthDep,
-) -> UserRead:
+) -> AdminRead:
     user_id = UUID(payload.sub)
 
     user: Admin | None = await db_session.scalar(
@@ -74,4 +74,4 @@ async def get_user(
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    return UserRead.model_validate(user, from_attributes=True)
+    return AdminRead.model_validate(user, from_attributes=True)
