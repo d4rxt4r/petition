@@ -1,52 +1,63 @@
+'use client';
+
+import { useTranslation } from 'react-i18next';
+
 export default function PrivacyPolicy() {
+    const { t } = useTranslation();
+
     return (
         <section className="px-4 max-w-7xl m-auto flex flex-col py-10">
             <h1 className="text-3xl md:text-6xl font-semibold mb-5 md:mb-10">
-                Политика конфиденциальности
+                {t('privacy_policy')}
             </h1>
             <p className="md:text-2xl mb-5 md:mb-10">
-                Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных, предоставляемых пользователями (далее — Пользователь) при заполнении форм на нашем сайте.
+                {t('privacy_policy_text.1')}
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                <span className="block font-semibold">1. Сбор и использование информации</span>
-                Мы собираем только те персональные данные, которые Пользователь добровольно предоставляет через формы на сайте:
+                <span className="block font-semibold">{t('privacy_policy_text.2')}</span>
+                {t('privacy_policy_text.3')}
                 <br />
-                — Имя;
+                {t('privacy_policy_text.4')}
                 <br />
-                — Номер телефона;
+                {t('privacy_policy_text.5')}
                 <br />
-                — Адрес электронной почты.
+                {t('privacy_policy_text.6')}
                 <br />
-                Собранные данные используются исключительно для следующих целей:
+                {t('privacy_policy_text.7')}
                 <br />
-                — Обратная связь с Пользователем;
+                {t('privacy_policy_text.8')}
                 <br />
-                — Информирование о наших услугах, акциях и новостях (с согласия Пользователя);
+                {t('privacy_policy_text.9')}
                 <br />
-                — Выполнение обязательств перед Пользователем.
+                {t('privacy_policy_text.10')}
 
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                <span className="block font-semibold">2. Хранение и защита данных</span>
-                Все персональные данные хранятся на защищённых серверах и обрабатываются с соблюдением требований законодательства о защите персональных данных. Мы предпринимаем все разумные меры для защиты информации от утраты, несанкционированного доступа, изменения или раскрытия.
+                <span className="block font-semibold">{t('privacy_policy_text.11')}</span>
+                {t('privacy_policy_text.12')}
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                <span className="block font-semibold">3. Передача третьим лицам</span>
-                Мы не передаём персональные данные третьим лицам, за исключением случаев, предусмотренных законом, или с предварительного согласия Пользователя.
+                <span className="block font-semibold">{t('privacy_policy_text.13')}</span>
+                {t('privacy_policy_text.14')}
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                <span className="block font-semibold">4. Отказ от рассылки и удаление данных</span>
-                Пользователь имеет право в любой момент отписаться от рассылки и/или потребовать удалить свои персональные данные, направив соответствующий запрос на наш контактный адрес электронной почты.
+                <span className="block font-semibold">{t('privacy_policy_text.15')}</span>
+                {t('privacy_policy_text.16')}
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                <span className="block font-semibold">5. Изменения в политике</span>
-                Мы оставляем за собой право вносить изменения в настоящую Политику. Все изменения публикуются на этой странице. Рекомендуем периодически проверять актуальность условий.
+                <span className="block font-semibold">{t('privacy_policy_text.17')}</span>
+                {t('privacy_policy_text.18')}
             </p>
             <p className="md:text-2xl mb-5 md:mb-10">
-                По всем вопросам, связанным с обработкой персональных данных, вы можете обратиться по электронной почте: [ваш_email@example.com].
+                {t('privacy_policy_text.19')}
+                :
+                {' '}
+                <a href="mailto:moldovavote@yandex.ru">moldovavote@yandex.ru</a>
+                .
                 <br />
                 <br />
-                Дата последнего обновления: [14.07.2025]
+                {t('privacy_policy_text.20')}
+                : 14.07.2025
             </p>
         </section>
     );

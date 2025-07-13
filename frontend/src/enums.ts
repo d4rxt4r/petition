@@ -29,3 +29,8 @@ export const PetitionStatusOptions = [{
     value: PetitionStatus.REJECTED.toString(),
     label: 'Не принята',
 }];
+
+export enum Language {
+    RU = 'ru',
+    RO = 'ro',
+}

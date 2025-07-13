@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface SignCounterProps {
@@ -8,6 +9,8 @@ interface SignCounterProps {
 }
 
 export function SignCounter({ accentBackground, invert, className }: SignCounterProps) {
+    const { t } = useTranslation();
+
     return (
         <div className={cn('rounded-lg py-3 px-4 md:px-10', accentBackground && 'bg-white', invert && 'bg-[#263796]', className)}>
             <span className={cn('text-3xl md:text-6xl font-semibold flex gap-2 items-center', invert && 'text-white')}>
@@ -15,7 +18,7 @@ export function SignCounter({ accentBackground, invert, className }: SignCounter
                 18945
             </span>
             <p className={cn('md:text-right text-sm md:text-lg', invert && 'text-white')}>
-                человек подписало
+                {t('counter_text')}
             </p>
         </div>
     );
