@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from authx.exceptions import MissingTokenError, AuthXException
 from loguru import logger
 
-from src.auth.models import User
+from src.auth.models import Admin
 from src.config import authx_config
 from src.auth import auth_router
 
@@ -62,7 +62,7 @@ async def security_headers(request: Request, call_next):
     return response
 
 
-auth = AuthX(config=authx_config, model=User)
+auth = AuthX(config=authx_config, model=Admin)
 auth.handle_errors(app)
 
 

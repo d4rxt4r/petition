@@ -12,6 +12,7 @@ from argon2.exceptions import (
 
 _pwd = PasswordHash.recommended()
 
+
 def hash_password(password: str) -> Any:
     """Хешируем пароль → строка вида  $argon2id$…"""
     return _pwd.hash(password)
@@ -35,16 +36,16 @@ async def verify_password(plain: str, hashed: str) -> bool:
     if verified and new_hash:
         # «тихое» обновление cost-параметров
         from src.database import async_session_maker
-        from src.auth.models import User
+        from src.auth.models import Admin
         import sqlalchemy as sa
         import asyncio
 
         async def _store():
             async with async_session_maker() as ses:
                 await ses.execute(
-                    sa.update(User)
-                      .where(User.hashed_password == hashed)
-                      .values(hashed_password=new_hash)
+                    sa.update(Admin)
+                    .where(Admin.hashed_password == hashed)
+                    .values(hashed_password=new_hash)
                 )
                 await ses.commit()
 

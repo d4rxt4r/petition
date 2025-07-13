@@ -1,12 +1,13 @@
 """
 Глобальные зависимости проекта.
 """
+
 from typing import Annotated
 
 from authx import AuthX, TokenPayload
 
 from src.config import authx_config
-from src.auth.models import User
+from src.auth.models import Admin
 from src.auth.repository import WorkspaceRepository
 
 from fastapi import Depends, HTTPException, status
@@ -21,7 +22,7 @@ from src.database import get_async_session
 
 auth = AuthX(
     config=authx_config,
-    model=User,
+    model=Admin,
 )
 
 
@@ -29,13 +30,15 @@ DBSessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 AuthDep = Annotated[TokenPayload, Depends(auth.access_token_required)]
 RefreshDep = Annotated[TokenPayload, Depends(auth.refresh_token_required)]
 
+
 def get_account_repository(
-    db_session: DBSessionDep,
-    payload: AuthDep
+    db_session: DBSessionDep, payload: AuthDep
 ) -> WorkspaceRepository:
     return WorkspaceRepository(db_session, payload.sub)
 
+
 WorkspaceRepoDep = Annotated[WorkspaceRepository, Depends(get_account_repository)]
+
 
 async def get_workspace_by_user(
     payload: AuthDep,
@@ -51,10 +54,7 @@ async def get_workspace_by_user(
     stmt = (
         select(Workspace)
         .options(selectinload(Workspace.members))
-        .where(
-            (Workspace.owner_id == user_id) |
-            (Workspace.members.any(id=user_id))
-        )
+        .where((Workspace.owner_id == user_id) | (Workspace.members.any(id=user_id)))
         .limit(1)  # убери если нужен список
     )
     result = await db_session.execute(stmt)
@@ -66,5 +66,5 @@ async def get_workspace_by_user(
         )
     return workspace
 
-WorkspaceDep = Annotated[Workspace, Depends(get_workspace_by_user)]
 
+WorkspaceDep = Annotated[Workspace, Depends(get_workspace_by_user)]
