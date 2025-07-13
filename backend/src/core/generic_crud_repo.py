@@ -3,7 +3,7 @@ core/abstract_repo.py
 ---------------------
 
 Contains AbstractCRUDRepository — a base generic class for
-CRUD operations, scoped by workspace_id, on SQLAlchemy models.
+CRUD operations
 
 All INSERT queries use `sqlalchemy.dialects.postgresql.insert`
 (as pg_insert) to support ON CONFLICT and bulk-insert functionality.
@@ -17,38 +17,34 @@ Subclasses must define:
 from collections.abc import Sequence
 from itertools import batched
 from typing import Any, Mapping, Optional, Protocol, Type, TypeVar, runtime_checkable
+from uuid import UUID
 
 from fastapi import HTTPException, status
 from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 from sqlalchemy import Select, bindparam, delete, func, select, update
-from sqlalchemy.orm import Mapped, declared_attr
+from sqlalchemy.orm import Mapped
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
-from src.database import int_pk
 from src.core.abstract_repo import BaseCRUDRepository, OrderByFields
 from src.core.schemas import BulkCreateResult, BulkUpdateResult
+from vote.models import uuid_pk
 
 
 @runtime_checkable
-class HasIdWorkspace(Protocol):
+class HasId(Protocol):
     """
-    Protocol that enforces the presence of `id` and `workspace_id` attributes.
+    Protocol that enforces the presence of `id` and attributes.
 
     Any ORM model or data class implementing this protocol must define:
-        - `id`: The primary key identifier (typically an integer)
-        - `workspace_id`: The associated workspace identifier (type may vary)
-
-    This protocol is intended for use with generic repository classes that
-    require models to be scoped or filtered by both primary key and workspace context.
+        - `id`: The primary key identifier (typically an uuid)
     """
 
-    id: Mapped[int_pk]
-    workspace_id: declared_attr[int]
+    id: Mapped[UUID] = uuid_pk()
 
 
-ORMModelT = TypeVar("ORMModelT", bound=HasIdWorkspace)
+ORMModelT = TypeVar("ORMModelT", bound=HasId)
 CreateSchemaT = TypeVar("CreateSchemaT", bound=BaseModel)
 UpdateSchemaT = TypeVar("UpdateSchemaT", bound=BaseModel)
 PydanticT = TypeVar("PydanticT", bound=BaseModel)
@@ -64,7 +60,7 @@ class GenericCRUDRepository(
 
     This abstract base class provides common Create, Read, Update, Delete
     operations and helpers (exists, count) for any ORM model that has at least
-    `id` and `workspace_id` attributes. Subclasses must set:
+    `id` attributes. Subclasses must set:
 
     NOTE:
         All create/upsert methods (`create`, `bulk_create`, `get_or_create`,
@@ -83,13 +79,12 @@ class GenericCRUDRepository(
     create_schema: type[CreateSchemaT]
     update_schema: type[UpdateSchemaT]
 
-    def __init__(self, db_session: AsyncSession, workspace_id: int) -> None:
+    def __init__(self, db_session: AsyncSession) -> None:
         self.db_session = db_session
-        self.workspace_id = workspace_id
 
     # ============================== Create ==============================
     async def create(
-        self, data: CreateSchemaT, exclude_fields: list[str] = []
+        self, data: CreateSchemaT, exclude_fields: Optional[list[str]] = None
     ) -> ORMModelT:
         """
         Insert a new record into the database.
@@ -103,14 +98,8 @@ class GenericCRUDRepository(
         Raises:
             SQLAlchemyError: If the INSERT fails for reasons other than conflict.
         """
-        stmt = (
-            pg_insert(self.model)
-            .values(
-                **data.model_dump(exclude=set(exclude_fields)),
-                workspace_id=self.workspace_id,
-            )
-            .returning(self.model)
-        )
+        values = data.model_dump(exclude=set(exclude_fields or []))
+        stmt = pg_insert(self.model).values(**values).returning(self.model)
         result = await self.db_session.execute(stmt)
         await self.db_session.commit()
         return result.scalar_one()
@@ -121,7 +110,7 @@ class GenericCRUDRepository(
         items: Sequence[CreateSchemaT],
         unique_by: Optional[tuple[str, ...]] = None,
         returning: Optional[tuple[str, ...]] = None,
-        exclude_fields: list[str] = [],
+        exclude_fields: Optional[list[str]] = None,
     ) -> BulkCreateResult:
         """
         Inserts a batch of records with a single query.
@@ -130,7 +119,7 @@ class GenericCRUDRepository(
             items: schemas to insert
             unique_by: fields to check for ON CONFLICT
             returning: field names for RETURNING.
-                Defaults to: ('id',) + unique_by + ('workspace_id',)
+                Defaults to: ('id',) + unique_by
 
         Returns:
             BulkResult with fields created (list[dict]) and errors (list[dict]).
@@ -139,19 +128,17 @@ class GenericCRUDRepository(
             return BulkCreateResult(created=[], errors=[])
 
         if returning is None:
-            returning = ("id",) + (unique_by or ()) + ("workspace_id",)
+            returning = ("id",) + (unique_by or ())
 
         cols_to_return = [getattr(self.model, name) for name in returning]
 
         payload: list[dict[str, Any]] = []
         idx_map: dict[tuple[Any], int] = {}
         for idx, item in enumerate(items):
-            row = item.model_dump(exclude=set(exclude_fields))
-            row["workspace_id"] = self.workspace_id
+            row = item.model_dump(exclude=set(exclude_fields or []))
             payload.append(row)
             if unique_by:
-                key = tuple(row[field] for field in unique_by) + (self.workspace_id,)
-                idx_map[key] = idx
+                idx_map[tuple(row[f] for f in unique_by)] = idx
 
         if not payload:
             return BulkCreateResult(created=[], errors=[])
@@ -177,11 +164,10 @@ class GenericCRUDRepository(
 
             if unique_by:
                 inserted_keys = {
-                    tuple(r[n] for n in unique_by) + (r["workspace_id"],): r["id"]
-                    for r in inserted
+                    tuple(r[n] for n in unique_by): r["id"] for r in inserted
                 }
                 for row in batch:
-                    key = tuple(row[f] for f in unique_by) + (row["workspace_id"],)
+                    key = tuple(row[f] for f in unique_by)
                     orig_idx = idx_map[key]
                     if key in inserted_keys:
                         created.append({**row, "id": inserted_keys[key]})
@@ -191,7 +177,6 @@ class GenericCRUDRepository(
                             {"index": orig_idx, **lookup, "reason": "duplicate"}
                         )
             else:
-                # без unique_by — просто возвращаем все вставленные в том же порядке
                 for i, ins in enumerate(inserted):
                     data = batch[i].copy()
                     data["id"] = ins["id"]
@@ -200,12 +185,10 @@ class GenericCRUDRepository(
         await self.db_session.commit()
         return BulkCreateResult(created=created, errors=errors)
 
-        # --------------------------------- Update One ---------------------------------
-
     async def update_one(
         self,
         *,
-        obj_id: int,
+        obj_id: UUID,
         data: UpdateSchemaT,
         exclude_unset: bool = True,
     ) -> int:
@@ -228,7 +211,6 @@ class GenericCRUDRepository(
             update(self.model)
             .where(
                 self.model.id == obj_id,
-                self.model.workspace_id == self.workspace_id,
             )
             .values(**payload, updated_at=func.now())
         )
@@ -240,7 +222,7 @@ class GenericCRUDRepository(
     async def update_many(
         self,
         *,
-        items: Sequence[tuple[int, UpdateSchemaT]],
+        items: Sequence[tuple[UUID, UpdateSchemaT]],
     ) -> BulkUpdateResult:
         """
         Обходит список (id, update_schema) и вызывает update_one для каждого.
@@ -287,7 +269,7 @@ class GenericCRUDRepository(
         unique_by: Optional[tuple[str, ...]] = None,
         update_fields: Optional[tuple[str, ...]] = None,
         returning: Optional[tuple[str, ...]] = None,
-        exclude_fields: list[str] = [],
+        exclude_fields: Optional[list[str]] = None,
     ) -> BulkUpdateResult:
         """
         WARNING: THIS METHOD DOUES NOT WORKING!
@@ -298,7 +280,7 @@ class GenericCRUDRepository(
             items: schemas to update (or upsert)
             unique_by: fields to identify conflicts (defaults to primary keys)
             update_fields: fields to update on conflict (defaults to all non-key, non-workspace fields)
-            returning: field names for RETURNING; defaults to 'id', unique_by, 'workspace_id'
+            returning: field names for RETURNING; defaults to 'id', unique_by
             exclude_fields: fields to drop from the payload before insert/update
 
         Returns:
@@ -307,30 +289,23 @@ class GenericCRUDRepository(
         if not items:
             return BulkUpdateResult(updated=[], errors=[])
 
-        # Determine conflict index
-        conflict_idx = unique_by or ("id", "workspace_id")
+        conflict_idx = unique_by or ("id",)
 
-        # Default RETURNING
         if returning is None:
-            returning = ("id",) + conflict_idx + ("workspace_id",)
+            returning = ("id",) + conflict_idx
         cols_to_return = [getattr(self.model, name) for name in returning]
 
-        # Build payload and map original indexes
         payload: list[dict[str, Any]] = []
         idx_map: dict[tuple[Any, ...], int] = {}
         for idx, item in enumerate(items):
-            row = item.model_dump(exclude=set(exclude_fields))
-            row["workspace_id"] = self.workspace_id
+            row = item.model_dump(exclude=set(exclude_fields or []))
             payload.append(row)
             key = tuple(row[f] for f in conflict_idx)
             idx_map[key] = idx
 
-        # Default update_fields -> all except keys and workspace_id
         if update_fields is None:
             update_fields = tuple(
-                f
-                for f in payload[0].keys()
-                if f not in set(conflict_idx) and f != "workspace_id"
+                f for f in payload[0].keys() if f not in set(conflict_idx)
             )
 
         # Determine batch size
@@ -346,7 +321,6 @@ class GenericCRUDRepository(
                 update(self.model)
                 .where(
                     self.model.id == bindparam("id"),
-                    self.model.workspace_id == bindparam("workspace_id"),
                 )
                 .values(
                     {field: bindparam(field) for field in update_fields},
@@ -389,11 +363,7 @@ class GenericCRUDRepository(
             - `instance` is the ORM object found or newly created.
             - `created` is `True` if a new row was inserted, `False` otherwise.
         """
-        stmt = (
-            select(self.model)
-            .where(self.model.workspace_id == self.workspace_id)
-            .filter_by(**lookup)
-        )
+        stmt = select(self.model).filter_by(**lookup)
         result = await self.db_session.execute(stmt)
         instance = result.scalar_one_or_none()
         if instance:
@@ -401,7 +371,6 @@ class GenericCRUDRepository(
         data = {
             **lookup,
             **(defaults or {}),
-            "workspace_id": self.workspace_id,
         }
 
         stmt = pg_insert(self.model).values(**data).returning(self.model)
@@ -430,7 +399,7 @@ class GenericCRUDRepository(
         Returns:
             The ORM instance that was inserted or updated.
         """
-        payload = data.model_dump() | {"workspace_id": self.workspace_id}
+        payload = data.model_dump()
         stmt = (
             pg_insert(self.model)
             .values(**payload)
@@ -447,7 +416,7 @@ class GenericCRUDRepository(
         return result.scalar_one()
 
     # =============================== Read ===============================
-    async def get(self, obj_id: int) -> Optional[ORMModelT]:
+    async def get(self, obj_id: UUID) -> Optional[ORMModelT]:
         """
         Retrieve a single record by its primary key.
 
@@ -458,12 +427,12 @@ class GenericCRUDRepository(
             The ORM instance if found, or `None` otherwise.
         """
         stmt = select(self.model).where(
-            self.model.id == obj_id, self.model.workspace_id == self.workspace_id
+            self.model.id == obj_id,
         )
         result = await self.db_session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_or_404(self, obj_id: int) -> ORMModelT:
+    async def get_or_404(self, obj_id: UUID) -> ORMModelT:
         """
         Same as get(), but raises HTTPException(404) if the object is not found.
 
@@ -487,7 +456,7 @@ class GenericCRUDRepository(
         *,
         limit: int = 100,
         offset: int = 0,
-        obj_ids: Optional[Sequence[int]],
+        obj_ids: Optional[Sequence[UUID]],
         order_by_fields: OrderByFields,
     ) -> Sequence[ORMModelT]:
         """
@@ -499,7 +468,7 @@ class GenericCRUDRepository(
         Returns:
             A sequence of ORM instances matching the given IDs.
         """
-        stmt = select(self.model).where(self.model.workspace_id == self.workspace_id)
+        stmt = select(self.model)
 
         if obj_ids:
             stmt = stmt.where(self.model.id.in_(obj_ids))
@@ -519,7 +488,6 @@ class GenericCRUDRepository(
         Retrieve all records with optional field filtering via Pydantic model.
         """
         if response_model:
-            # Получаем только те поля, которые есть в Pydantic модели
             model_fields = response_model.model_fields.keys()
             columns = []
 
@@ -527,25 +495,20 @@ class GenericCRUDRepository(
                 if hasattr(self.model, field_name):
                     columns.append(getattr(self.model, field_name))
 
-            # Запрашиваем только нужные колонки
-            stmt = select(*columns).where(self.model.workspace_id == self.workspace_id)
+            stmt = select(*columns)
             result = await self.db_session.execute(stmt)
 
-            # Преобразуем в словари и валидируем через Pydantic
             rows = result.mappings().all()
             return [response_model.model_validate(row) for row in rows]
         else:
-            # Полный запрос
-            stmt = select(self.model).where(
-                self.model.workspace_id == self.workspace_id
-            )
+            stmt = select(self.model)
             result = await self.db_session.execute(stmt)
             return result.scalars().all()
 
     # ------------------------------ Update ------------------------------
     async def update(
         self,
-        obj_id: int,
+        obj_id: UUID,
         data: UpdateSchemaT,
     ) -> Optional[ORMModelT]:
         """
@@ -566,7 +529,6 @@ class GenericCRUDRepository(
             update(self.model)
             .where(
                 self.model.id == obj_id,
-                self.model.workspace_id == self.workspace_id,
             )
             .values(**data.model_dump())
             .returning(self.model)
@@ -578,7 +540,7 @@ class GenericCRUDRepository(
     async def update_list(
         self,
         *,
-        obj_ids: list[int],
+        obj_ids: list[UUID],
         data: UpdateSchemaT,
     ) -> int:
         """
@@ -602,7 +564,6 @@ class GenericCRUDRepository(
             update(self.model)
             .where(
                 self.model.id.in_(obj_ids),
-                self.model.workspace_id == self.workspace_id,
             )
             .values(**payload)
         )
@@ -614,7 +575,7 @@ class GenericCRUDRepository(
     # ============================== Delete ==============================
     async def delete(
         self,
-        obj_id: int,
+        obj_id: UUID,
     ) -> bool:
         """
         Delete a single record by primary key.
@@ -627,7 +588,6 @@ class GenericCRUDRepository(
         """
         stmt = delete(self.model).where(
             self.model.id == obj_id,
-            self.model.workspace_id == self.workspace_id,
         )
 
         result = await self.db_session.execute(stmt)
@@ -638,7 +598,7 @@ class GenericCRUDRepository(
     async def exists(
         self,
         *,
-        obj_id: int,
+        obj_id: UUID,
     ) -> bool:
         """
         Check if a record exists.
@@ -651,7 +611,6 @@ class GenericCRUDRepository(
         """
         stmt = select(self.model.id).where(
             self.model.id == obj_id,
-            self.model.workspace_id == self.workspace_id,
         )
         result = await self.db_session.execute(stmt)
         return result.scalar_one_or_none() is not None
@@ -661,13 +620,9 @@ class GenericCRUDRepository(
         Count how many records exist for this workspace.
 
         Returns:
-            The total number of rows for the given `workspace_id`.
+            The total number of rows for the given
         """
-        stmt = (
-            select(func.count())
-            .select_from(self.model)
-            .where(self.model.workspace_id == self.workspace_id)
-        )
+        stmt = select(func.count()).select_from(self.model)
         result = await self.db_session.execute(stmt)
         return result.scalar_one()
 
@@ -685,12 +640,6 @@ class GenericCRUDRepository(
         Subclasses may override this method to implement more advanced
         filtering logic (range queries, ``LIKE`` patterns, joins to related
         tables, etc.) while keeping the common call-site in :pymeth:`get_list`.
-
-        Args:
-            stmt: The initial SQLAlchemy ``Select`` already scoped by
-                ``workspace_id`` or other mandatory constraints.
-            filters: Mapping of *column_name → value* to be applied as exact
-                comparisons.
 
         Returns:
             The modified (or original) ``Select`` with the additional

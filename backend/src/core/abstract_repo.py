@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, TypeAlias, TypeVar, Generic, Optional, Sequence
+from uuid import UUID
 
 from sqlalchemy import ColumnElement
 
@@ -38,7 +39,7 @@ class BaseCRUDRepository(Generic[T, CreateT, UpdateT], ABC):
     ) -> tuple[T, bool]: ...
 
     @abstractmethod
-    async def get(self, obj_id: int) -> Optional[T]: ...
+    async def get(self, obj_id: UUID) -> Optional[T]: ...
 
     @abstractmethod
     async def get_list(
@@ -46,12 +47,12 @@ class BaseCRUDRepository(Generic[T, CreateT, UpdateT], ABC):
         *,
         limit: int,
         offset: int,
-        obj_ids: Optional[Sequence[int]],
+        obj_ids: Optional[Sequence[UUID]],
         order_by_fields: OrderByFields,
     ) -> Sequence[T]: ...
 
     @abstractmethod
-    async def update(self, obj_id: int, data: UpdateT) -> Optional[T]: ...
+    async def update(self, obj_id: UUID, data: UpdateT) -> Optional[T]: ...
 
     @abstractmethod
-    async def delete(self, obj_id: int) -> bool: ...
+    async def delete(self, obj_id: UUID) -> bool: ...
