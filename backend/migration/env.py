@@ -6,7 +6,8 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.database import DATABASE_URL, Base
-import src.auth.models  # noqa
+import src.auth.models
+import src.vote.models
 
 config = context.config
 if config.config_file_name:
