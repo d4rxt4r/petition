@@ -2,18 +2,17 @@ services:
   postgres:
     build:
       context: ./database
-      dockerfile: Dockerfile
     container_name: postgres_db
     restart: unless-stopped
     env_file:
-      - ./.env/.env.postgres.dev
+      - ./.envs/.env.postgres.dev
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d:ro
       - postgres_data:/var/lib/postgresql/data
       - ./backend:/app:ro
     networks: [backend]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,7 +22,7 @@ services:
     image: prodrigestivill/postgres-backup-local:17
     restart: unless-stopped
     env_file:
-      - ./.env/.env.postgres.dev
+      - ./.envs/.env.postgres.dev
     volumes:
       - ./backups:/backups
     networks: [backend]
@@ -37,8 +36,8 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ./.env/.env.backend.dev
-      - ./.env/.env.postgres.dev
+      - ./.envs/.env.backend.dev
+      - ./.envs/.env.postgres.dev
     volumes:
       - ./backend:/app
     depends_on:
@@ -59,7 +58,7 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - ./.env/.env.frontend.dev
+      - ./.envs/.env.frontend.dev
     environment:
       - NEXT_DISABLE_TURBOPACK=1
     volumes:

@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     SECRET: str
     JWT_SECRET_KEY: str
+    YCAPTCHA_SERVER_KEY: str
 
     BASE_DIR: Path = BASE_DIR
     STATIC_DIR: Path = STATIC_DIR

@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_serializer
 
 from vote.models import VoteStatus
 
@@ -59,3 +60,19 @@ class SmsVerificationUpdate(SmsVerificationCreate):
 
 class SmsVerificationRead(SmsVerificationUpdate):
     pass
+
+
+class ValidateVote(UserCreate):
+    token: str
+
+
+class CaptchaValidateResp(BaseModel):
+    status: str
+    message: str
+    host: Optional[str]
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    @field_serializer("message", "host")
+    def none_to_empty(self, value: Optional[str], info) -> str:
+        return value or ""
