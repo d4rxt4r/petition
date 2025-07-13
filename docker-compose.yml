@@ -1,6 +1,8 @@
 services:
   postgres:
-    image: postgres:17
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     container_name: postgres_db
     restart: unless-stopped
     env_file:
@@ -8,9 +10,10 @@ services:
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d:ro
       - postgres_data:/var/lib/postgresql/data
+      - ./backend:/app:ro
     networks: [backend]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,19 +31,6 @@ services:
       postgres:
         condition: service_healthy
 
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    networks: [backend]
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
@@ -53,8 +43,6 @@ services:
       - ./backend:/app
     depends_on:
       postgres:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     networks: [backend, frontend]
     command: uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
@@ -110,7 +98,6 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
 
 networks:
   backend: {}
