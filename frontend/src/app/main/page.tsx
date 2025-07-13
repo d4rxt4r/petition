@@ -27,9 +27,9 @@ export default function MainPage() {
                             {t('jambo_description')}
                         </p>
 
-                        <button type="button" className="mt-auto rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
+                        <a href="/main#petition-form" className="mt-auto text-center cursor-pointer rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
                             {t('sign_petition')}
-                        </button>
+                        </a>
                     </div>
                     <div className="hidden bg-[#F2F2F2] rounded-md md:block basis-1/2 shrink-0 relative">
                         <Image alt="flag" src="/img/flag.png" width={660} height={720} />
