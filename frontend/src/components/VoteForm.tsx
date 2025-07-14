@@ -128,7 +128,6 @@ export function VoteForm() {
                         render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    {/* <input {...field} className="bg-white p-6 rounded-2xl text-lg" placeholder={t('phone_placeholder')} type="tel" required /> */}
                                     <PhoneInput {...field} placeholder={t('phone_placeholder')} countries={['RU', 'MD']} defaultCountry="RU" international />
                                 </FormControl>
                                 <FormMessage />
