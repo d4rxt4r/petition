@@ -23,7 +23,13 @@ export const VoteFormSchema = z.object({
 export type VoteFormData = z.infer<typeof VoteFormSchema>;
 
 export const SMSFormSchema = z.object({
-    code: z.string().min(6).max(6),
+    code: z.string({
+        error: 'Некорректный код',
+    }).min(6, {
+        error: 'Некорректный код',
+    }).max(6, {
+        error: 'Некорректный код',
+    }),
 });
 
 export type SMSFormData = z.infer<typeof SMSFormSchema>;

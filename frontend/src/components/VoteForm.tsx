@@ -2,6 +2,7 @@ import type { SMSFormData, VoteFormData } from '@/schema';
 import { SmartCaptcha } from '@yandex/smart-captcha';
 import { env } from 'next-runtime-env';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,7 @@ const defaultValues = {
 };
 
 export function VoteForm() {
+    const router = useRouter();
     const { t, i18n } = useTranslation();
 
     const NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY = env('NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY');
@@ -53,16 +55,35 @@ export function VoteForm() {
         });
 
         if (res.status === 200) {
-            // todo
             setConfirmedPhone(phone_number);
             setShowConfirmation(true);
+        }
+    };
+
+    const onSubmitSMS = async (values: SMSFormData) => {
+        const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/verify_sms' : '/api/vote/verify_sms';
+        const { code } = values;
+
+        const res = await fetch(apiPath, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                phone: confirmedPhone,
+                code,
+            }),
+        });
+
+        if (res.status === 200) {
+            router.push('/main/thank-you');
         }
     };
 
     if (showConfirmation) {
         return (
             <Form {...smsForm}>
-                <form className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
+                <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
                     <div className="flex flex-col gap-4 mb-10">
                         <FormField
                             control={smsForm.control}
