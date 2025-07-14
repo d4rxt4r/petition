@@ -22,10 +22,12 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from rich.progress import BarColumn, Progress, TextColumn, TimeElapsedColumn
 from sqlalchemy import Select, bindparam, delete, func, select, update
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Mapped
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
+from loguru import logger
 
 from src.core.abstract_repo import BaseCRUDRepository, OrderByFields
 from src.core.schemas import BulkCreateResult, BulkUpdateResult
@@ -99,10 +101,33 @@ class GenericCRUDRepository(
             SQLAlchemyError: If the INSERT fails for reasons other than conflict.
         """
         values = data.model_dump(exclude=set(exclude_fields or []))
+        logger.debug(f"INSERT {self.model.__name__}: {values!r}")
+
         stmt = pg_insert(self.model).values(**values).returning(self.model)
-        result = await self.db_session.execute(stmt)
-        await self.db_session.commit()
-        return result.scalar_one()
+        try:
+            result = await self.db_session.execute(stmt)
+            await self.db_session.commit()
+            obj = result.scalar_one()
+            logger.info(f"{self.model.__name__} created: {obj!r}")
+            return obj
+
+        except IntegrityError as exc:
+            await self.db_session.rollback()
+            logger.warning(
+                "IntegrityError on INSERT %s – %s",
+                self.model.__name__,
+                exc.orig,
+                exc_info=True,
+            )
+            raise HTTPException(
+                status_code=400,
+                detail=f"{self.model.__name__} with these unique fields already exists",
+            ) from exc
+
+        except SQLAlchemyError as exc:
+            await self.db_session.rollback()
+            logger.exception("SQLAlchemyError on INSERT", exc_info=True)
+            raise
 
     async def bulk_create(
         self,
