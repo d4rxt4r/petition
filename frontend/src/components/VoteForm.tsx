@@ -40,6 +40,9 @@ export function VoteForm() {
         resolver: customResolver(SMSFormSchema),
     });
 
+    const [resetCaptcha, setResetCaptcha] = useState(0);
+    const handleCaptchaReset = () => setResetCaptcha((prev) => prev + 1);
+
     const [confirmedPhone, setConfirmedPhone] = useState('');
     const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -80,9 +83,11 @@ export function VoteForm() {
                         message: t('vote_error'),
                     });
                 }
+                handleCaptchaReset();
             }
         } catch (error) {
             console.error(error);
+            handleCaptchaReset();
         }
     };
 
@@ -223,6 +228,7 @@ export function VoteForm() {
                                 <FormControl>
                                     <SmartCaptcha
                                         {...field}
+                                        key={resetCaptcha}
                                         language={i18n.language === 'ru' ? 'ru' : 'en'}
                                         sitekey={NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY as string}
                                         onSuccess={(token) => {
@@ -230,6 +236,7 @@ export function VoteForm() {
                                         }}
                                         onTokenExpired={() => {
                                             field.onChange('');
+                                            handleCaptchaReset();
                                         }}
                                     />
                                 </FormControl>
