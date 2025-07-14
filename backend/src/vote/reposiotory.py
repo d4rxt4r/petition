@@ -39,7 +39,7 @@ class SmsVerificationRepo(
     update_schema = SmsVerificationUpdate
 
     CODE_TTL = timedelta(minutes=5)
-    MAX_ATTEMPTS = 3
+    MAX_ATTEMPTS = 10
 
     def _gen_code(self) -> str:
         return f"{randbelow(1_000_000):06d}"

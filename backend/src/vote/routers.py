@@ -1,9 +1,12 @@
-from typing import Optional
+from typing import IO, Optional
+from io import BytesIO
 from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy.exc import SQLAlchemyError, DBAPIError, PendingRollbackError
+from fastapi.responses import StreamingResponse
 import requests
 from sqlalchemy import select
 from starlette.responses import JSONResponse
+import pandas as pd
 
 from src.config import settings
 from src.dependencies import AuthDep, DBSessionDep
@@ -17,6 +20,7 @@ from src.vote.schemas import (
     UserUpdate,
     ValidateVote,
     VotingRead,
+    VotingUpdate,
 )
 
 from src.core.sms_aero import send_code
@@ -34,7 +38,6 @@ async def validate_vote(
     sms_repo: SmsRepoDep,
     db: DBSessionDep,
 ):
-    # 1. Проверка наличия токена ------------------------------------------------
     if not form_data.token:
         raise HTTPException(status_code=400, detail="Missing token")
 
@@ -68,55 +71,36 @@ async def validate_vote(
             content={"status": "failed", "message": result.message},
         )
 
-    # 3. Пользователь + SMS в одной транзакции ---------------------------------
-    phone = form_data.phone_number  # pydantic гарантирует +7 / +373 формат
+    phone = form_data.phone_number
 
     try:
-        logger.info("Начало записи в базу")
-        async with db.begin():
-            logger.info("Ищем пользователя в базе")
-            stmt = select(User).where(User.phone_number == phone)
-            try:
-                user: User | None = await db.scalar(stmt)
-            except PendingRollbackError:
-                await db.rollback()
-                logger.error("Session in FAILED state, rolled back")
-                raise HTTPException(500, "DB rollback needed")
-            except DBAPIError as exc:
-                logger.exception("Low-level DB error")
-                raise HTTPException(502, "Database unavailable")
-            except SQLAlchemyError as exc:
-                logger.exception("ORM error")
-                raise HTTPException(500, "Query error")
+        stmt = select(User).where(User.phone_number == phone)
+        user: User | None = await db.scalar(stmt)
 
-            logger.info("Поиск пользователя завершен успешно")
-            if user is None:
-                user = await user_repo.create(
-                    UserCreate(
-                        phone_number=form_data.phone_number,
-                        full_name=form_data.full_name,
-                        email=form_data.email,
-                    )
+        if user is None:
+            user = await user_repo.create(
+                UserCreate(
+                    phone_number=form_data.phone_number,
+                    full_name=form_data.full_name,
+                    email=form_data.email,
                 )
+            )
 
-            logger.info("Создаем смс верификацию")
-            code = await sms_repo.create_or_resend(phone, user.id)
+        code = await sms_repo.create_or_resend(phone, user.id)
 
-            logger.info("Смс верификацию создана")
+        if code is None:
+            raise HTTPException(
+                status_code=400,
+                detail={"status": "already_verified", "host": result.host},
+            )
 
-            if code is None:
-                raise HTTPException(
-                    status_code=400,
-                    detail={"status": "already_verified", "host": result.host},
-                )
+        try:
+            send_code(phone, code)
+        except Exception as exc:
+            logger.exception("SMS sending failed")
+            raise HTTPException(502, "SMS provider error")
 
-            logger.info("Отправляем смс")
-            try:
-                send_code(phone, code)
-            except Exception as exc:
-                logger.exception("SMS sending failed")
-                raise HTTPException(502, "SMS provider error")
-
+        await db.commit()
         return {"status": "sms_sent", "host": result.host}
 
     except Exception:
@@ -154,14 +138,57 @@ async def vote_counts(
 
 
 @router.get("/all_user")
-async def get_all_user(user_repo: UserRepoDep) -> list[UserRead]:
+async def get_all_user(
+    user_repo: UserRepoDep,
+) -> list[UserRead]:
     return [UserRead.model_validate(obj) for obj in await user_repo.get_all()]
 
 
 @router.post("/update_user")
 async def get_update_user(
-    user_repo: UserRepoDep, form_data: UserUpdate
+    user_repo: UserRepoDep,
+    form_data: UserUpdate,
 ) -> Optional[UserUpdate]:
-    updated_obj = await user_repo.update(obj_id=form_data.id, data=form_data)
-    if updated_obj:
-        return UserRead.model_validate(updated_obj)
+    upd_obj = await user_repo.update(obj_id=form_data.id, data=form_data)
+    if upd_obj:
+        return UserUpdate.model_validate(upd_obj)
+
+
+@router.get("/update_vote")
+async def update_vote(
+    voting_repo: VotingRepoDep,
+    form_data: VotingUpdate,
+) -> Optional[VotingUpdate]:
+    upd_obj = await voting_repo.update(obj_id=form_data.id, data=form_data)
+    if upd_obj:
+        return VotingUpdate.model_validate(upd_obj)
+
+
+@router.get("/export_users_excel", response_class=StreamingResponse)
+async def export_users_excel(user_repo: UserRepoDep) -> StreamingResponse:
+    # 1. Получаем пользователей
+    users = await user_repo.get_all()
+    data = [
+        {
+            "ID": str(u.id),
+            "Full Name": u.full_name or "",
+            "Email": u.email or "",
+            "Phone Number": u.phone_number,
+            "Valid Vote": "Да" if u.valid_vote else "Нет",
+        }
+        for u in users
+    ]
+
+    # 2. DataFrame -> Excel в память
+    df = pd.DataFrame(data)
+    buffer: IO[bytes] = BytesIO()  # достаточно IO[bytes] для Pyright
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+        df.to_excel(writer, index=False)
+    buffer.seek(0)
+
+    # 3. Отдаём файл
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="users.xlsx"'},
+    )
