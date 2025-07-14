@@ -16,7 +16,7 @@ interface SignCounterProps {
 export function SignCounter({ accentBackground, invert, className }: SignCounterProps) {
     const { t } = useTranslation();
 
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(null);
 
     useEffect(() => {
         const controller = new AbortController();

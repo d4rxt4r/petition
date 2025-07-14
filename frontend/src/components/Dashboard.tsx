@@ -4,14 +4,15 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { TrashIcon } from 'lucide-react';
 import { env } from 'next-runtime-env';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { PetitionStatus, PetitionStatusOptions, TableFilterOptions } from '@/enums';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { DataTable } from './ui/data-table';
 import { DatePicker } from './ui/date-picker';
 import { Input } from './ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { SelectExt } from './ui/select-ext';
 import { ToggleExt } from './ui/toggle-ext';
 
@@ -30,6 +31,8 @@ async function fetchTableData(controller: AbortController) {
 }
 
 export function Dashboard() {
+    const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
+
     const [startDate, setStartDate] = useState<Date | undefined>(() => new Date());
     const [endDate, setEndDate] = useState<Date | undefined>(() => new Date());
 
@@ -39,7 +42,29 @@ export function Dashboard() {
     const [useRealCount, setUseRealCount] = useState(false);
 
     const updateVoting = async () => {
-        console.log(startDate, endDate, status, count, useRealCount);
+        const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_vote' : '/api/vote/update_vote';
+        const res = await fetch(apiPath, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // id: 1,
+                start_date: startDate,
+                end_date: endDate,
+                real_quantity: 0,
+                fake_quantity: count,
+                show_real: useRealCount,
+                status,
+            }),
+        });
+
+        if (res.status === 200) {
+            toast.success('Данные успешно обновлены');
+        } else {
+            console.error(res);
+            toast.error('Ошибка при обновлении данных');
+        }
     };
 
     const [tableData, setTableData] = useState<Array<{ valid_vote: boolean }>>(() => []);
@@ -56,12 +81,14 @@ export function Dashboard() {
 
     useEffect(() => {
         const controller = new AbortController();
-        fetchTableData(controller);
+        (async () => {
+            const data = await fetchTableData(controller);
+            setTableData(data);
+        })();
         return () => controller.abort();
     }, []);
 
     const onRemove = async (voteId: number) => {
-        const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_user' : '/api/vote/update_user';
         try {
             const res = await fetch(apiPath, {
@@ -76,14 +103,32 @@ export function Dashboard() {
             });
             const data = await res.json();
             if (res.status === 200) {
+                toast.success('Данные успешно обновлены');
                 const controller = new AbortController();
                 const data = await fetchTableData(controller);
                 setTableData(data);
             } else {
                 console.error(data);
+                toast.error('Ошибка при обновлении данных');
             }
         } catch (e) {
             console.error(e);
+        }
+    };
+
+    const createExcel = async () => {
+        const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/export_users_excel' : '/api/vote/export_users_excel';
+        const res = await fetch(apiPath);
+        if (res.status === 200) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Выгрузка данных.xlsx';
+            a.click();
+        } else {
+            console.error(res);
+            toast.error('Произошла ошибка при выгрузке данных');
         }
     };
 
@@ -100,6 +145,10 @@ export function Dashboard() {
         id: 'actions',
         cell: ({ row }) => {
             const vote = row.original;
+            if (!vote.valid_vote) {
+                return null;
+            }
+
             return (
                 <div className="flex gap-4 justify-end">
                     <Popover>
@@ -154,7 +203,7 @@ export function Dashboard() {
                     Количество голосов
                 </h2>
                 <div className="flex gap-4 items-center">
-                    <Input disabled={useRealCount} type="number" value={count} onChange={(e) => setCount(Number.parseInt(e.target.value))} className="w-fit" />
+                    <Input disabled={useRealCount} type="number" value={count} onChange={(e) => setCount(Number.parseInt(e.target.value) || 0)} className="w-fit" />
                     <Checkbox checked={useRealCount} onCheckedChange={(checked) => setUseRealCount(Boolean(checked))} />
                     <span>Использовать настоящее кол-во</span>
                 </div>
@@ -166,8 +215,9 @@ export function Dashboard() {
 
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center w-full">
-                    <h2>
+                    <h2 className="flex gap-4 items-center">
                         Собранные подписи
+                        <Button onClick={createExcel}>Выгрузить в Excel</Button>
                     </h2>
                     <div>
                         <SelectExt placeholder="Фильтр по валидности записей" value={tableFilter} onValueChange={setTableFilter} options={TableFilterOptions} />
