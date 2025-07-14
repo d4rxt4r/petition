@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Request
 from sqlalchemy.exc import SQLAlchemyError, DBAPIError, PendingRollbackError
 import requests
@@ -12,6 +13,8 @@ from src.vote.schemas import (
     CaptchaValidateResp,
     SmsVerifyBody,
     UserCreate,
+    UserRead,
+    UserUpdate,
     ValidateVote,
     VotingRead,
 )
@@ -148,3 +151,17 @@ async def vote_counts(
         quantity=quantity,
         status=voting.status,
     )
+
+
+@router.get("/all_user")
+async def get_all_user(user_repo: UserRepoDep) -> list[UserRead]:
+    return [UserRead.model_validate(obj) for obj in await user_repo.get_all()]
+
+
+@router.post("/update_user")
+async def get_update_user(
+    user_repo: UserRepoDep, form_data: UserUpdate
+) -> Optional[UserUpdate]:
+    updated_obj = await user_repo.update(obj_id=form_data.id, data=form_data)
+    if updated_obj:
+        return UserRead.model_validate(updated_obj)

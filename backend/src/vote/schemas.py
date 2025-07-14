@@ -12,19 +12,26 @@ class UserCreate(BaseModel):
     full_name: str
     email: str
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class ValidateVote(UserCreate):
     token: str
 
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
-class UserUpdate(UserCreate):
+
+class UserUpdate(BaseModel):
     id: UUID
+    valid_vote: bool
+
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
-class UserRead(UserUpdate):
-    pass
+class UserRead(UserCreate):
+    id: UUID
+    valid_vote: bool
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class VotingCreate(BaseModel):
@@ -35,11 +42,12 @@ class VotingCreate(BaseModel):
     show_real: bool
     status: VoteStatus
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class VotingUpdate(VotingCreate):
     id: UUID
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class VotingRead(BaseModel):
@@ -48,7 +56,7 @@ class VotingRead(BaseModel):
     quantity: int
     status: VoteStatus
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class SmsVerificationCreate(BaseModel):
@@ -60,13 +68,17 @@ class SmsVerificationCreate(BaseModel):
     is_verified: bool
     user_id: UUID
 
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
+
 
 class SmsVerificationUpdate(SmsVerificationCreate):
     id: UUID
 
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
+
 
 class SmsVerificationRead(SmsVerificationUpdate):
-    pass
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
 
 class CaptchaValidateResp(BaseModel):
@@ -74,7 +86,7 @@ class CaptchaValidateResp(BaseModel):
     message: Optional[str]
     host: Optional[str]
 
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
     @field_serializer("message", "host")
     def none_to_empty(self, value: Optional[str], info) -> str:
@@ -100,3 +112,5 @@ Code6 = Annotated[
 class SmsVerifyBody(BaseModel):
     phone: Phone
     code: Code6
+
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)
