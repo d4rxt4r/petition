@@ -22,7 +22,11 @@ export default function StatusPage() {
                     signal: controller.signal,
                 });
                 const data = await res.json();
-                setStatus(data?.status);
+                if (new Date(data?.end_data)?.getTime() <= new Date().getTime()) {
+                    setStatus(PetitionStatus.PENDING);
+                } else {
+                    setStatus(data?.status);
+                }
             } catch (e) {
                 console.error(e);
             }

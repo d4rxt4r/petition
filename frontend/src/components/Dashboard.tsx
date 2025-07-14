@@ -5,7 +5,7 @@ import { TrashIcon } from 'lucide-react';
 import { env } from 'next-runtime-env';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { PetitionStatus, PetitionStatusOptions, TableFilterOptions } from '@/enums';
+import { PetitionStatusOptions, TableFilterOptions } from '@/enums';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { DataTable } from './ui/data-table';
@@ -30,16 +30,38 @@ async function fetchTableData(controller: AbortController) {
     }
 }
 
+const emptyArray: any[] = [];
+
 export function Dashboard() {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
 
-    const [startDate, setStartDate] = useState<Date | undefined>(() => new Date());
-    const [endDate, setEndDate] = useState<Date | undefined>(() => new Date());
+    const [petitionState, setPetitionState] = useState<any>(() => { });
 
-    const [status, setStatus] = useState(PetitionStatus.ACTIVE.toString());
+    useEffect(() => {
+        const controller = new AbortController();
 
-    const [count, setCount] = useState(0);
-    const [useRealCount, setUseRealCount] = useState(false);
+        const fetchCount = async () => {
+            const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
+            const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/dash_vote_info' : '/api/vote/dash_vote_info';
+            try {
+                const res = await fetch(apiPath, {
+                    signal: controller.signal,
+                });
+                const data = await res.json();
+                setPetitionState({
+                    ...data,
+                    start_date: new Date(data.start_date),
+                    end_date: new Date(data.end_date),
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetchCount();
+
+        return () => controller.abort();
+    }, []);
 
     const updateVoting = async () => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_vote' : '/api/vote/update_vote';
@@ -48,15 +70,7 @@ export function Dashboard() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                // id: 1,
-                start_date: startDate,
-                end_date: endDate,
-                real_quantity: 0,
-                fake_quantity: count,
-                show_real: useRealCount,
-                status,
-            }),
+            body: JSON.stringify(petitionState),
         });
 
         if (res.status === 200) {
@@ -69,15 +83,17 @@ export function Dashboard() {
 
     const [tableData, setTableData] = useState<Array<{ valid_vote: boolean }>>(() => []);
     const [tableFilter, setTableFilter] = useState(TableFilterOptions[0].value);
-    const filteredData = tableData.filter((rec) => {
-        if (tableFilter === '0') {
-            return rec.valid_vote === true;
-        }
-        if (tableFilter === '1') {
-            return rec.valid_vote === false;
-        }
-        return true;
-    });
+    const filteredData = tableData
+        ? tableData.filter((rec) => {
+                if (tableFilter === '0') {
+                    return rec.valid_vote === true;
+                }
+                if (tableFilter === '1') {
+                    return rec.valid_vote === false;
+                }
+                return true;
+            })
+        : emptyArray;
 
     useEffect(() => {
         const controller = new AbortController();
@@ -176,8 +192,24 @@ export function Dashboard() {
                     Дата начала и дата окончания сбора подписей
                 </h2>
                 <div className="flex gap-4">
-                    <DatePicker value={startDate} onChange={setStartDate} />
-                    <DatePicker value={endDate} onChange={setEndDate} />
+                    <DatePicker
+                        value={petitionState?.start_date}
+                        onChange={(date) => {
+                            setPetitionState((prev: any) => ({
+                                ...prev,
+                                start_date: date,
+                            }));
+                        }}
+                    />
+                    <DatePicker
+                        value={petitionState?.end_date}
+                        onChange={(date) => {
+                            setPetitionState((prev: any) => ({
+                                ...prev,
+                                end_date: date,
+                            }));
+                        }}
+                    />
                 </div>
             </div>
 
@@ -189,9 +221,12 @@ export function Dashboard() {
                     <ToggleExt
                         type="single"
                         variant="outline"
-                        value={status?.toString()}
+                        value={petitionState?.status}
                         onValueChange={(status) => {
-                            setStatus(status);
+                            setPetitionState((prev: any) => ({
+                                ...prev,
+                                status,
+                            }));
                         }}
                         options={PetitionStatusOptions}
                     />
@@ -200,11 +235,32 @@ export function Dashboard() {
 
             <div className="flex flex-col gap-2">
                 <h2>
-                    Количество голосов
+                    Количество голосов:
+                    {' '}
+                    {petitionState?.real_quantity}
                 </h2>
                 <div className="flex gap-4 items-center">
-                    <Input disabled={useRealCount} type="number" value={count} onChange={(e) => setCount(Number.parseInt(e.target.value) || 0)} className="w-fit" />
-                    <Checkbox checked={useRealCount} onCheckedChange={(checked) => setUseRealCount(Boolean(checked))} />
+                    <Input
+                        disabled={petitionState?.show_real}
+                        type="number"
+                        value={petitionState?.fake_quantity}
+                        onChange={(e) => {
+                            setPetitionState((prev: any) => ({
+                                ...prev,
+                                fake_quantity: Number.parseInt(e.target.value) || 0,
+                            }));
+                        }}
+                        className="w-fit"
+                    />
+                    <Checkbox
+                        checked={petitionState?.show_real}
+                        onCheckedChange={(checked) => {
+                            setPetitionState((prev: any) => ({
+                                ...prev,
+                                show_real: Boolean(checked),
+                            }));
+                        }}
+                    />
                     <span>Использовать настоящее кол-во</span>
                 </div>
             </div>

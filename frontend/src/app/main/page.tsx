@@ -29,7 +29,12 @@ export default function MainPage() {
                     signal: controller.signal,
                 });
                 const data = await res.json();
-                setStatus(data?.status);
+                console.log(data?.end_data, new Date(data?.end_data).getDate() <= new Date().getDate());
+                if (new Date(data?.end_data).getDate() <= new Date().getDate()) {
+                    setStatus(PetitionStatus.PENDING);
+                } else {
+                    setStatus(data?.status);
+                }
             } catch (e) {
                 console.error(e);
             }
