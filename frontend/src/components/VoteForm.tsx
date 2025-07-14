@@ -1,0 +1,93 @@
+import type { VoteFormData } from '@/schema';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { customResolver } from '@/lib/zodResolver';
+import { VoteFormSchema } from '@/schema';
+import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form';
+import { PhoneInput } from './ui/phone-input';
+
+const defaultValues = {
+    fullName: '',
+    phone: '',
+    email: '',
+};
+
+export function VoteForm() {
+    const { t } = useTranslation();
+
+    const form = useForm<VoteFormData>({
+        resolver: customResolver(VoteFormSchema),
+        defaultValues,
+    });
+
+    const onSubmit = async (values: VoteFormData) => {
+        // const { error } = await saveRailwayStationForm(values);
+        // if (error) {
+        //     toast.error('Ошибка при сохранении информации о вокзале');
+        // } else {
+        //     toast.success('Информация о вокзале успешно сохранена');
+        //     setOpen(false);
+        // }
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
+                <div className="text-3xl md:text-5xl font-semibold mb-12">
+                    {t('vote_header')}
+                </div>
+                <div className="flex flex-col gap-4 mb-10">
+                    <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <input {...field} className="bg-white p-6 rounded-2xl text-lg" placeholder={t('fullName_placeholder')} type="text" required />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    {/* <input {...field} className="bg-white p-6 rounded-2xl text-lg" placeholder={t('phone_placeholder')} type="tel" required /> */}
+                                    <PhoneInput {...field} placeholder={t('phone_placeholder')} countries={['RU', 'MD']} defaultCountry="RU" international />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <input {...field} className="bg-white p-6 rounded-2xl text-lg" placeholder={t('email_placeholder')} type="email" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                <div className="mb-10 flex gap-2 items-center">
+                    <input id="agreement" type="checkbox" value="" required className="appearance-none checked:appearance-auto w-8 h-8 shrink-0 bg-white border-none rounded-sm" />
+                    <span>
+                        {t('agreement_text')}
+                        {' '}
+                        <Link href="/main/privacy-policy" className="underline">{t('agreement_link')}</Link>
+                    </span>
+                </div>
+                <button type="submit" className="mt-auto rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
+                    {t('sign_petition')}
+                </button>
+            </form>
+        </Form>
+    );
+}

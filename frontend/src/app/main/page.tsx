@@ -1,25 +1,35 @@
+'use client';
+
 import Image from 'next/image';
-import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
 import { SignCounter } from '@/components/SignCounter';
+import { VoteForm } from '@/components/VoteForm';
+
+import '@/i18n';
 
 export default function MainPage() {
+    const { t } = useTranslation();
+
     return (
         <>
             <section id="jumbo" className="px-4 flex items-center m-auto max-w-7xl md:min-h-[calc(100vh-68px)]">
                 <div className="flex flex-col md:flex-row gap-12">
-                    <div className="basis-1/2 shrink-0 pt-14 flex flex-col">
+                    <div className="flex-1 shrink-0 pt-14 flex flex-col">
                         <h1 className="text-3xl md:text-6xl font-semibold mb-4 md:mb-10">
-                            Петиция граждан Молдавии, живущих в России
+                            {t('jambo_header')}
                         </h1>
                         <div className="mb-4 bg-[#F2F2F2] rounded-md md:hidden basis-1/2 shrink-0 relative">
                             <Image alt="flag" src="/img/flag.png" width={660} height={720} />
                             <SignCounter accentBackground className="absolute bottom-[10] left-[100] md:right-[100] md:bottom-[60]" />
                         </div>
                         <p className="mb-4 md:mb-0 md:text-2xl">
-                            Мы, граждане Республики Молдова, работающие и живущие в России, убеждены в том, что наше право на свободные выборы президента Республики Молдова в октябре 2024 года были грубо нарушены.
+                            {t('jambo_description')}
                         </p>
 
-                        <button type="button" className="mt-auto rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">Подписать петицию</button>
+                        <a href="/main#petition-form" className="mt-auto text-center cursor-pointer rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
+                            {t('sign_petition')}
+                        </a>
                     </div>
                     <div className="hidden bg-[#F2F2F2] rounded-md md:block basis-1/2 shrink-0 relative">
                         <Image alt="flag" src="/img/flag.png" width={660} height={720} />
@@ -30,92 +40,74 @@ export default function MainPage() {
 
             <main id="petition" className="px-4 max-w-7xl m-auto md:text-2xl mb-16">
                 <h2 className="text-3xl md:text-6xl font-semibold mb-5 md:mb-10 pt-10">
-                    Текст петиции
+                    {t('petition_title')}
                 </h2>
                 <p className="pb-4 md:pb-8">
-                    Власти Республики Молдова открыли только два избирательных участка в России в г. Москва, поэтому молдаване из большинства регионов России не смогли проголосовать на выборах.
+                    {t('petition.p1')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    В сентябре 2024 года в строгом соответствии со ст. 39 Избирательного Кодекса Республики Молдова мы зарегистрировались (8238 граждан) на официальном сайте ЦИК Молдовы для открытия избирательных участков
-                    г. Москва, г. Санкт-Петербург, г. Ярославль и г. Сургут, но Министерство иностранных дел Республики Молдова запретило открытие избирательных участков везде, кроме г. Москва.
-                    При этом, в Италии зарегистрировано на сайте ЦИК почти в три раза меньше избирателей (2499 граждан) чем в России, а открыто в 30 раз больше избирательных участков, чем в России.
+                    {t('petition.p2')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    Искусственное ограничение числа избирательных участков в России, фактически лишило десятки тысяч молдаван, права на свободные выборы и нарушило:
+                    {t('petition.p3')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://www.constcourt.md/public/files/file/Baza%20legala/constitutia_ro_22.05.17_ru.pdf">— статьи 16 и 38 Конституции Республики Молдова</a>
-                    , согласно которым все граждане Республики Молдова равны перед законом и имеют право участвовать в свободных выборах;
+                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://www.constcourt.md/public/files/file/Baza%20legala/constitutia_ro_22.05.17_ru.pdf">
+                        {t('petition.a1')}
+                    </a>
+                    {t('petition.p4')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://www.un.org/ru/documents/decl_conv/declarations/declhr.shtml">— статью 21 Всеобщей декларации прав человека</a>
-                    {' '}
-                    (принята на третьей сессии Генеральной Ассамблеи ООН резолюцией 217 А (III) от 10 декабря 1948 года), согласно которой воля народа выражается при всеобщем и равном избирательном праве;
+                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://www.un.org/ru/documents/decl_conv/declarations/declhr.shtml">
+                        {t('petition.a2')}
+                    </a>
+                    {t('petition.p5')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://docs.cntd.ru/document/901867999">— статью 3 Протокола № 1/</a>
-                    {' '}
-                    (подписан в г. Париж 20 марта 1952 года) Конвенции о защите прав человека и основных свобод (подписана в г. Рим 04 ноября 1950 года), согласно которой страны участницы обязаны проводить свободные выборы путем тайного голосования в таких условиях, которые обеспечивали бы свободное волеизъявление народа;
+                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://docs.cntd.ru/document/901867999">
+                        {t('petition.a3')}
+                    </a>
+                    {t('petition.p6')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://hrlibrary.umn.edu/russian/gencomm/Rhrcom25.html">— статью 25 Международного пакта о гражданских и политических правах</a>
-                    {' '}
-                    (подписан в г. Нью-Йорк 16 декабря 1966 года), согласно которой каждый гражданин должен иметь без какой бы то ни было дискриминации право голосовать на выборах;
+                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://hrlibrary.umn.edu/russian/gencomm/Rhrcom25.html">
+                        {t('petition.a4')}
+                    </a>
+                    {t('petition.p7')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://docs.cntd.ru/document/901836765">— статью 3 Конвенции о стандартах демократических выборов, избирательных прав и свобод в государствах - участниках Содружества Независимых Государств</a>
-                    {' '}
-                    (подписана в г. Кишинев 7 октября 2002 года), согласно которой каждый избиратель имеет право на равный и беспрепятственный доступ на избирательный участок, чтобы реализовать свое право на участие в свободном голосовании.
+                    <a target="_blank" rel="noreferrer noopener" className="underline font-semibold" href="https://docs.cntd.ru/document/901836765">
+                        {t('petition.a5')}
+                    </a>
+                    {t('petition.p8')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    Наши обращения по данным фактам в ЦИК и МИД Республики Молдова не получили ответа.
-                    Мы обращаемся в Международный суд ООН, Европейский суд по правам человека, Верховный комиссариат ОБСЕ по делам национальных меньшинств, Бюро по демократическим институтам и правам человека ОБСЕ, Парламентскую ассамблею Совета Европы, Европейскую комиссию и другие международные правозащитные организации, осуществляющие мониторинг соблюдения прав человека, с просьбой оказать влияние на органы власти Республики Молдова и обеспечить открытие избирательных участков для голосования на выборах в депутаты в парламент Республики Молдова
+                    {t('petition.p9')}
                 </p>
                 <p className="pb-4 md:pb-8">
-                    28 сентября 2025 года в г. Москва, г. Санкт-Петербург, г. Красноярск,
-                    г. Иркутск, г. Хабаровск, г. Владивосток, г. Новосибирск,
-                    г. Омск, г. Тюмень, г. Самара, г. Нижний Новгород, г. Ростов-на-Дону,
-                    г. Ставрополь, г. Краснодар, г. Волгоград и г. Ярославль.
+                    {t('petition.p10')}
                 </p>
                 <div className="flex gap-6">
                     <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
-                        <span className="font-semibold">Адресат</span>
-                        <p>Парламент Республики Молдова</p>
+                        <span className="font-semibold">{t('addressee')}</span>
+                        <p>{t('addressee_name')}</p>
                     </div>
                     <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
-                        <span className="font-semibold">Автор</span>
-                        <p>Иван Иванов</p>
+                        <span className="font-semibold">{t('author')}</span>
+                        <p>{t('author_name')}</p>
                     </div>
                 </div>
             </main>
 
             <section id="attention" className="py-12 bg-linear-to-t from-[#1A2B87] to-[#4155C7]">
                 <h3 className="text-white text-2xl md:text-4xl px-4 max-w-7xl m-auto md:leading-[50px]">
-                    Призываем мировое сообщество и руководство Республики Молдова обеспечить нам конституционное избирательное право и не допустить дискриминацию молдаван России на выборах депутатов в парламент Республики Молдовы 28 сентября 2025 года
+                    {t('attention_text')}
                 </h3>
             </section>
 
             <section id="petition-form" className="px-4 w-full max-w-7xl m-auto py-14 md:py-[100px]">
                 <div className="flex gap-14">
-                    <div className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
-                        <div className="text-3xl md:text-5xl font-semibold mb-12">
-                            Форма подписания
-                        </div>
-                        <div className="flex flex-col gap-4 mb-10">
-                            <input id="fullName" className="bg-white p-6 rounded-2xl text-lg" placeholder="Введите ФИО" type="text" required />
-                            <input id="phone" type="tel" className="bg-white p-6 rounded-2xl text-lg" placeholder="Введите номер телефона" required />
-                            <input id="email" type="email" className="bg-white p-6 rounded-2xl text-lg" placeholder="Введите почту" />
-                        </div>
-                        <div className="mb-10 flex gap-2 items-center">
-                            <input id="agreement" type="checkbox" value="" required className="appearance-none checked:appearance-auto w-8 h-8 shrink-0 bg-white border-none rounded-sm" />
-                            <span>
-                                Согласие на передачу и обработку
-                                {' '}
-                                <Link href="/main/privacy-policy" className="underline">персональных данных</Link>
-                            </span>
-                        </div>
-                        <button type="submit" className="mt-auto rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">Подписать петицию</button>
-                    </div>
+                    <VoteForm />
 
                     <div className="hidden md:flex shrink-0 bg-[#F2F2F2] rounded-2xl relative flex-col justify-end w-[380px] overflow-hidden">
                         <SignCounter className="absolute top-[50] z-10" />
@@ -123,7 +115,7 @@ export default function MainPage() {
                         <div className="text-white bg-linear-to-t from-[#1A2B87] to-[#4155C7] pt-[330px] p-6">
                             <Image src="/img/form.svg" className="absolute bottom-0 left-0 right-0 z-0" alt="form" width={380} height={600} />
                             <div className="relative z-10 pb-4">
-                                Поделиться в
+                                {t('share_text')}
                             </div>
                             <div className="flex gap-3 relative z-10">
                                 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,45 +138,51 @@ export default function MainPage() {
 
             <section id="how-it-works" className="px-4 max-w-7xl m-auto pb-14 md:pb-[100px]">
                 <div className="text-4xl md:text-5xl font-semibold mb-7 md:mb-14">
-                    Как работает подписание?
+                    {t('how_it_works')}
                 </div>
                 <div className="flex flex-col md:flex-row gap-8">
                     <div className="h-[380px] flex flex-col flex-1 gap-4 md:gap-0 bg-[#F2F2F2] rounded-2xl p-6 md:p-8">
                         <h4 className="font-semibold text-2xl md:text-4xl">
-                            Шаг 1
+                            {t('step')}
+                            {' '}
+                            1
                         </h4>
                         <div className="mt-auto flex flex-col gap-2">
                             <span className="font-semibold md:text-2xl">
-                                Ознакомьтесь с петицией
+                                {t('step_1.title')}
                             </span>
                             <p className="text-black/60 md:text-xl">
-                                Убедитесь, что вы поддерживаете её суть.
+                                {t('step_1.description')}
                             </p>
                         </div>
                     </div>
                     <div className="h-[380px] flex flex-col flex-1 gap-4 md:gap-0 bg-[#F2F2F2] rounded-2xl p-6 md:p-8">
                         <h4 className="font-semibold text-2xl md:text-4xl">
-                            Шаг 2
+                            {t('step')}
+                            {' '}
+                            2
                         </h4>
                         <div className="mt-auto flex flex-col gap-2">
                             <span className="font-semibold md:text-2xl">
-                                Введите свои данные
+                                {t('step_2.title')}
                             </span>
                             <p className="text-black/60 md:text-xl">
-                                ФИО, email и телефон — для подтверждения подписи.
+                                {t('step_2.description')}
                             </p>
                         </div>
                     </div>
                     <div className="h-[380px] flex flex-col flex-1 gap-4 md:gap-0 bg-[#F2F2F2] rounded-2xl p-6 md:p-8">
                         <h4 className="font-semibold text-2xl md:text-4xl">
-                            Шаг 3
+                            {t('step')}
+                            {' '}
+                            3
                         </h4>
                         <div className="mt-auto flex flex-col gap-2">
                             <span className="font-semibold md:text-2xl">
-                                Нажмите «Подписать»
+                                {t('step_3.title')}
                             </span>
                             <p className="text-black/60 md:text-xl">
-                                Подтвердите участие и, если нужно, проверьте почту.
+                                {t('step_3.description')}
                             </p>
                         </div>
                     </div>

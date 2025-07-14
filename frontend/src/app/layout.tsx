@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { Viewport } from 'next';
 import localFont from 'next/font/local';
+import { Suspense } from 'react';
 import './globals.css';
 
 const SFPro = localFont({
@@ -38,7 +39,9 @@ export default function RootLayout({
             <body
                 className={`${SFPro.className} antialiased flex flex-col min-h-screen m-auto`}
             >
-                {children}
+                <Suspense>
+                    {children}
+                </Suspense>
             </body>
         </html>
     );
