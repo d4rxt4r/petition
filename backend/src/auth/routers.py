@@ -22,39 +22,39 @@ from src.dependencies import (
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post(
-    "/register",
-    status_code=status.HTTP_201_CREATED,
-    summary="Регистрация нового пользователя",
-)
-async def register(
-    data: RegisterForm,
-    response: Response,
-    db: AsyncSession = Depends(get_async_session),
-):
-    # 1) проверяем, что email ещё не занят
-    exists = await db.scalar(select(Admin).where(Admin.email == data.email))
-    if exists:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail="Пользователь с таким email уже существует",
-        )
-
-    # 2) создаём запись в БД
-    user = Admin(
-        email=data.email,
-        hashed_password=hash_password(data.password),
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-
-    access = auth.create_access_token(uid=str(user.id), fresh=True)
-    refresh = auth.create_refresh_token(uid=str(user.id))
-    auth.set_access_cookies(access, response)
-    auth.set_refresh_cookies(refresh, response)
-
-    return {"msg": "Регистрация успешна", "user_id": user.id}
+# @router.post(
+#     "/register",
+#     status_code=status.HTTP_201_CREATED,
+#     summary="Регистрация нового пользователя",
+# )
+# async def register(
+#     data: RegisterForm,
+#     response: Response,
+#     db: AsyncSession = Depends(get_async_session),
+# ):
+#     # 1) проверяем, что email ещё не занят
+#     exists = await db.scalar(select(Admin).where(Admin.email == data.email))
+#     if exists:
+#         raise HTTPException(
+#             status.HTTP_400_BAD_REQUEST,
+#             detail="Пользователь с таким email уже существует",
+#         )
+#
+#     # 2) создаём запись в БД
+#     user = Admin(
+#         email=data.email,
+#         hashed_password=hash_password(data.password),
+#     )
+#     db.add(user)
+#     await db.commit()
+#     await db.refresh(user)
+#
+#     access = auth.create_access_token(uid=str(user.id), fresh=True)
+#     refresh = auth.create_refresh_token(uid=str(user.id))
+#     auth.set_access_cookies(access, response)
+#     auth.set_refresh_cookies(refresh, response)
+#
+#     return {"msg": "Регистрация успешна", "user_id": user.id}
 
 
 @router.post("/login", status_code=status.HTTP_204_NO_CONTENT, summary="Вход (login)")
