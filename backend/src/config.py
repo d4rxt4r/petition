@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     YCAPTCHA_SERVER_KEY: str
     SMS_EMAIL: str
     SMS_API_KEY: str
+    SMS_SIGN: str
 
     BASE_DIR: Path = BASE_DIR
     STATIC_DIR: Path = STATIC_DIR

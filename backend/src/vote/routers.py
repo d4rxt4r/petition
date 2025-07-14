@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 
 from src.config import settings
 from src.dependencies import AuthDep, DBSessionDep
-from src.vote.dependencies import SmsRepoDep, UserRepoDep
+from src.vote.dependencies import SmsRepoDep, UserRepoDep, VotingRepoDep
 from src.vote.models import SmsVerification, User
 from src.vote.schemas import (
     CaptchaValidateResp,
@@ -16,6 +16,7 @@ from src.vote.schemas import (
 
 from src.core.sms_aero import send_code
 
+from loguru import logger
 
 router = APIRouter(prefix="/vote", tags=["vote"])
 
@@ -85,10 +86,11 @@ async def validate_vote(
             if code is None:
                 return {"status": "already_verified", "host": result.host}
 
+            logger.info("Отправляем смс")
             # 3.5 Пытаемся отправить SMS (может выбросить исключение)
             await send_code(
                 phone, code
-            )  # Twilio пример :contentReference[oaicite:3]{index=3}
+            )
 
         # 4. Транзакция успешно завершена
         return {"status": "sms_sent", "host": result.host}
@@ -105,3 +107,9 @@ async def verify_sms(body: SmsVerifyBody, repo: SmsRepoDep):
     if not ok:
         raise HTTPException(400, "Код неверен, истёк или превышено число попыток")
     return {"status": "ok"}
+
+
+@routers.get("/vote_info")
+async def vote_counts(repo: VotingRepoDep):
+    
+

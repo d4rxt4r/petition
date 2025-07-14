@@ -42,8 +42,13 @@ class VotingUpdate(VotingCreate):
     id: UUID
 
 
-class VotingRead(VotingUpdate):
-    pass
+class VotingRead(BaseModel):
+    start_date: datetime
+    end_date: datetime
+    quantity: int
+    status: VoteStatus
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class SmsVerificationCreate(BaseModel):
