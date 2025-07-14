@@ -129,13 +129,18 @@ async def verify_sms(body: SmsVerifyBody, repo: SmsRepoDep):
 
 
 @router.get("/vote_info")
-async def vote_counts(repo: VotingRepoDep) -> VotingRead:
-    votings = await repo.get_all()
+async def vote_counts(
+    voting_repo: VotingRepoDep,
+    user_repo: UserRepoDep,
+) -> VotingRead:
+    votings = await voting_repo.get_all()
     if not votings:
         raise HTTPException(status_code=404, detail="No voting campaigns found")
 
     voting = votings[0]
-    quantity = voting.real_quantity if voting.show_real else voting.fake_quantity
+    users = await user_repo.get_all()
+    real_quantity = len(users)
+    quantity = real_quantity if voting.show_real else voting.fake_quantity
 
     return VotingRead(
         start_date=voting.start_date,
