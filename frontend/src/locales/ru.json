@@ -76,6 +76,7 @@
     "petition_accepted": "Принята",
     "petition_rejected": "Не принят",
     "vote_header": "Форма подписания",
+    "sms_header": "Подтверждение подписи",
     "fullName_placeholder": "Введите ФИО",
     "phone_placeholder": "Введите номер телефона",
     "email_placeholder": "Введите почту",

@@ -35,7 +35,7 @@ export function VoteForm() {
     });
 
     const [confirmedPhone, setConfirmedPhone] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(true);
 
     const onSubmit = async (values: VoteFormData) => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/validate' : '/api/vote/validate';
@@ -83,7 +83,10 @@ export function VoteForm() {
     if (showConfirmation) {
         return (
             <Form {...smsForm}>
-                <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
+                <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 md:min-h-[818px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
+                    <div className="text-3xl md:text-5xl font-semibold mb-12">
+                        {t('sms_header')}
+                    </div>
                     <div className="flex flex-col gap-4 mb-10">
                         <FormField
                             control={smsForm.control}
