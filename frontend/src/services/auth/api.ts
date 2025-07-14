@@ -42,12 +42,12 @@ class AuthApi extends BaseApi {
      * Функция выхода из системы с удалением токена с базы
      */
     public async logout(): Promise<any> {
-        const response = await this.post('/api/auth/v1/logout');
+        const response = await this.post('/api/auth/logout');
         return response;
     }
 
     public async deleteAccount(): Promise<any> {
-        const response = await this.delete('/api/auth/v1/users/delete');
+        const response = await this.delete('/api/auth/users/delete');
         return response;
     }
 
@@ -107,7 +107,7 @@ class AuthApi extends BaseApi {
     }
 
     public async updateProfile(data: FormData): Promise<any> {
-        const response = await this.put('/api/auth/v1/users/', data, {
+        const response = await this.put('/api/auth/users/', data, {
             'Content-Type': 'multipart/form-data',
         });
         return response;
