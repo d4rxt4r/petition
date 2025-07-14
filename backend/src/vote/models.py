@@ -6,7 +6,6 @@ from uuid import UUID
 from sqlalchemy import (
     VARCHAR,
     Boolean,
-    CHAR,
     DateTime,
     ForeignKey,
     Integer,
@@ -51,7 +50,7 @@ class User(Base):
         nullable=False,
     )
 
-    valid_vote: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    valid_vote: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     __table_args__ = (UniqueConstraint("phone_number", name="uq_user_phone"),)
 

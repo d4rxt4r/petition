@@ -74,9 +74,11 @@ async def validate_vote(
     phone = form_data.phone_number
 
     try:
+        logger.info("Перед поиском пользователя")
         stmt = select(User).where(User.phone_number == phone)
         user: User | None = await db.scalar(stmt)
 
+        logger.info("После поиска пользователя")
         if user is None:
             user = await user_repo.create(
                 UserCreate(
@@ -86,7 +88,9 @@ async def validate_vote(
                 )
             )
 
+        logger.info("Перед отправкой смс")
         code = await sms_repo.create_or_resend(phone, user.id)
+        logger.info("После отправки смс")
 
         if code is None:
             raise HTTPException(
@@ -133,6 +137,30 @@ async def vote_counts(
         start_date=voting.start_date,
         end_date=voting.end_date,
         quantity=quantity,
+        status=voting.status,
+    )
+
+
+@router.get("/dash_vote_info")
+async def vote_info(
+    voting_repo: VotingRepoDep,
+    user_repo: UserRepoDep,
+) -> VotingUpdate:
+    votings = await voting_repo.get_all()
+    if not votings:
+        raise HTTPException(status_code=404, detail="No voting campaigns found")
+
+    voting = votings[0]
+    users = await user_repo.get_all()
+    real_quantity = len(users)
+
+    return VotingUpdate(
+        id=voting.id,
+        start_date=voting.start_date,
+        end_date=voting.end_date,
+        real_quantity=real_quantity,
+        fake_quantity=voting.fake_quantity,
+        show_real=voting.show_real,
         status=voting.status,
     )
 

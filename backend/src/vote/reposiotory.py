@@ -1,8 +1,9 @@
 from secrets import randbelow
 from datetime import datetime, timedelta, timezone
+from typing import Sequence
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import select, true, update
 
 from src.core.generic_crud_repo import GenericCRUDRepository
 
@@ -23,6 +24,11 @@ class UserRepo(GenericCRUDRepository[User, UserCreate, UserUpdate]):
     model = User
     create_schema = UserCreate
     update_schema = UserUpdate
+
+    async def get_all_valid(self) -> Sequence[User]:
+        stmt = select(self.model).where(User.valid_vote.is_(true()))
+        result = await self.db_session.execute(stmt)
+        return result.scalars().all()
 
 
 class VotingRepo(GenericCRUDRepository[Voting, VotingCreate, VotingUpdate]):
