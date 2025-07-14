@@ -77,12 +77,14 @@ export function VoteForm() {
 
         if (res.status === 200) {
             router.push('/main/thank-you');
+        } else {
+            smsForm.setError('code', { type: 'custom', message: t('sms_error') });
         }
     };
 
     if (showConfirmation) {
         return (
-            <Form {...smsForm}>
+            <Form {...smsForm} key="sms-form">
                 <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 md:min-h-[714px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8">
                     <div className="text-3xl md:text-5xl font-semibold mb-10">
                         {t('sms_header')}
@@ -110,7 +112,7 @@ export function VoteForm() {
     }
 
     return (
-        <Form {...form}>
+        <Form {...form} key="form">
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8">
                 <div className="text-3xl md:text-5xl font-semibold mb-10">
                     {t('vote_header')}
