@@ -34,3 +34,13 @@ export enum Language {
     RU = 'ru',
     RO = 'ro',
 }
+
+export const TableFilterOptions = [{
+    key: 'valid',
+    value: '0',
+    label: 'Валидные',
+}, {
+    key: 'invalid',
+    value: '1',
+    label: 'Не валидные',
+}];

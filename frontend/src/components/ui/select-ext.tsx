@@ -21,7 +21,7 @@ export interface ISelectExtOption {
 
 export function SelectExt({
     className,
-    placeholder = 'Выберите из списка',
+    placeholder,
     options,
     ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root> & {
@@ -39,8 +39,8 @@ export function SelectExt({
 
     return (
         <Select {...props}>
-            <div className={cn('w-fit relative', className)}>
-                <SelectTrigger className="pr-8 w-full">
+            <div className={cn(className, 'w-full relative')}>
+                <SelectTrigger className="pr-8">
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
                 <div className="absolute right-2 top-0 h-full flex items-center">
