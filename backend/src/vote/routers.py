@@ -154,7 +154,7 @@ async def get_update_user(
         return UserUpdate.model_validate(upd_obj)
 
 
-@router.get("/update_vote")
+@router.post("/update_vote")
 async def update_vote(
     voting_repo: VotingRepoDep,
     form_data: VotingUpdate,
