@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { Viewport } from 'next';
+import { PublicEnvScript } from 'next-runtime-env';
 import localFont from 'next/font/local';
 import { Suspense } from 'react';
 import './globals.css';
@@ -35,7 +36,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className="scroll-smooth">
+        <html lang="ru" className="scroll-smooth">
+            <head>
+                <PublicEnvScript />
+            </head>
             <body
                 className={`${SFPro.className} antialiased flex flex-col min-h-screen m-auto`}
             >

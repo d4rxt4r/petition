@@ -1,4 +1,6 @@
 import type { VoteFormData } from '@/schema';
+import { SmartCaptcha } from '@yandex/smart-captcha';
+import { env } from 'next-runtime-env';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,10 +13,13 @@ const defaultValues = {
     fullName: '',
     phone: '',
     email: '',
+    captcha: '',
 };
 
 export function VoteForm() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+
+    const NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY = env('NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY');
 
     const form = useForm<VoteFormData>({
         resolver: customResolver(VoteFormSchema),
@@ -22,13 +27,7 @@ export function VoteForm() {
     });
 
     const onSubmit = async (values: VoteFormData) => {
-        // const { error } = await saveRailwayStationForm(values);
-        // if (error) {
-        //     toast.error('Ошибка при сохранении информации о вокзале');
-        // } else {
-        //     toast.success('Информация о вокзале успешно сохранена');
-        //     setOpen(false);
-        // }
+        console.log(values);
     };
 
     return (
@@ -75,16 +74,59 @@ export function VoteForm() {
                             </FormItem>
                         )}
                     />
+                    <FormField
+                        control={form.control}
+                        name="captcha"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                    <SmartCaptcha
+                                        {...field}
+                                        language={i18n.language === 'ru' ? 'ru' : 'en'}
+                                        sitekey={NEXT_PUBLIC_YCAPTCHA_CLIENT_KEY as string}
+                                        onSuccess={(token) => {
+                                            field.onChange(token);
+                                        }}
+                                        onTokenExpired={() => {
+                                            field.onChange('');
+                                        }}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
-                <div className="mb-10 flex gap-2 items-center">
-                    <input id="agreement" type="checkbox" value="" required className="appearance-none checked:appearance-auto w-8 h-8 shrink-0 bg-white border-none rounded-sm" />
-                    <span>
-                        {t('agreement_text')}
-                        {' '}
-                        <Link href="/main/privacy-policy" className="underline">{t('agreement_link')}</Link>
-                    </span>
-                </div>
-                <button type="submit" className="mt-auto rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
+                <FormField
+                    control={form.control}
+                    name="agreement"
+                    render={({ field }) => (
+                        <FormItem className="mb-10">
+                            <div className="flex gap-2 items-center">
+                                <FormControl>
+                                    <input
+                                        {...field}
+                                        className="appearance-none checked:appearance-auto w-8 h-8 shrink-0 bg-white border-none rounded-sm"
+                                        value={field.value ? 'yes' : ''}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            field.onChange(checked);
+                                        }}
+                                        type="checkbox"
+                                        required
+                                    />
+                                </FormControl>
+                                <span>
+                                    {t('agreement_text')}
+                                    {' '}
+                                    <Link href="/main/privacy-policy" className="underline">{t('agreement_link')}</Link>
+                                </span>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <button type="submit" className="mt-auto cursor-pointer rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
                     {t('sign_petition')}
                 </button>
             </form>
