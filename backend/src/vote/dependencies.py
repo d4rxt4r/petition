@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 from src.dependencies import DBSessionDep
-from vote.reposiotory import SmsVerificationRepo, UserRepo
+from src.vote.reposiotory import SmsVerificationRepo, UserRepo
 
 
 def get_sms_repo(

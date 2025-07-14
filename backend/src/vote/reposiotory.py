@@ -6,8 +6,8 @@ from sqlalchemy import select, update
 
 from src.core.generic_crud_repo import GenericCRUDRepository
 
-from vote.models import SmsVerification, User, Voting
-from vote.schemas import (
+from src.vote.models import SmsVerification, User, Voting
+from src.vote.schemas import (
     SmsVerificationCreate,
     SmsVerificationUpdate,
     UserCreate,

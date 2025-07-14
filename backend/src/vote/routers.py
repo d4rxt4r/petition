@@ -4,10 +4,15 @@ from sqlalchemy import select
 from starlette.responses import JSONResponse
 
 from src.config import settings
-from dependencies import AuthDep, DBSessionDep
-from vote.dependencies import SmsRepoDep, UserRepoDep
-from vote.models import SmsVerification, User
-from vote.schemas import CaptchaValidateResp, SmsVerifyBody, UserCreate, ValidateVote
+from src.dependencies import AuthDep, DBSessionDep
+from src.vote.dependencies import SmsRepoDep, UserRepoDep
+from src.vote.models import SmsVerification, User
+from src.vote.schemas import (
+    CaptchaValidateResp,
+    SmsVerifyBody,
+    UserCreate,
+    ValidateVote,
+)
 
 from src.core.sms_aero import send_code
 

@@ -29,7 +29,7 @@ from pydantic import BaseModel
 
 from src.core.abstract_repo import BaseCRUDRepository, OrderByFields
 from src.core.schemas import BulkCreateResult, BulkUpdateResult
-from vote.models import uuid_pk
+from src.vote.models import uuid_pk
 
 
 @runtime_checkable

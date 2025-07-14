@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, constr, field_serializer
 
-from vote.models import VoteStatus
+from src.vote.models import VoteStatus
 
 
 class UserCreate(BaseModel):
