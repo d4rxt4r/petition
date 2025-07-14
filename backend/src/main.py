@@ -8,11 +8,13 @@ from loguru import logger
 from src.auth.models import Admin
 from src.config import authx_config
 from src.auth import auth_router
+from src.vote import vote_router
 
 
 app = FastAPI()
 
 app.include_router(auth_router)
+app.include_router(vote_router)
 
 origins = [
     "http://localhost:3000",
