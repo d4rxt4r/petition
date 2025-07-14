@@ -80,5 +80,6 @@
     "phone_placeholder": "Introduceți numărul dvs. de telefon",
     "email_placeholder": "Introduceți adresa dvs. de e-mail",
     "agreement_text": "Consimțământ pentru transfer și prelucrare",
-    "agreement_link": "date personale"
+    "agreement_link": "date personale",
+    "sms_placeholder": "Introduceți codul din SMS"
 }

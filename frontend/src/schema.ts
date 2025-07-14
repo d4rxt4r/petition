@@ -1,8 +1,8 @@
 import { z } from 'zod/v4';
 
 export const VoteFormSchema = z.object({
-    fullName: z.string().min(1).max(255),
-    phone: z.e164({
+    full_name: z.string().min(1).max(255),
+    phone_number: z.e164({
         error: 'Некорректный номер телефона',
     }),
     agreement: z.literal(true, {
@@ -15,9 +15,15 @@ export const VoteFormSchema = z.object({
     }).email({
         error: 'Некорректный email',
     })),
-    captcha: z.string().nonempty({
+    token: z.string().nonempty({
         message: 'Пожалуйста, пройдите проверку',
     }),
 });
 
 export type VoteFormData = z.infer<typeof VoteFormSchema>;
+
+export const SMSFormSchema = z.object({
+    code: z.string().min(6).max(6),
+});
+
+export type SMSFormData = z.infer<typeof SMSFormSchema>;
