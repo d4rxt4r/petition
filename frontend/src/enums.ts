@@ -1,8 +1,8 @@
 export enum PetitionStatus {
-    ACTIVE,
-    PENDING,
-    SIGNED,
-    REJECTED,
+    ACTIVE = 'Сбор подписей',
+    PENDING = 'На проверке',
+    SIGNED = 'Принято',
+    REJECTED = 'Не принято',
 }
 
 export const StatusText = {

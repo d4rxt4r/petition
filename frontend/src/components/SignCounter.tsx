@@ -1,3 +1,4 @@
+import { env } from 'next-runtime-env';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +20,17 @@ export function SignCounter({ accentBackground, invert, className }: SignCounter
         const controller = new AbortController();
 
         const fetchCount = async () => {
-            const res = await fetch('/api/sign-counter', {
-                signal: controller.signal,
-            });
-            const data = await res.json();
-            setCount(data?.count);
+            const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
+            const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/vote_info' : '/api/vote/vote_info';
+            try {
+                const res = await fetch(apiPath, {
+                    signal: controller.signal,
+                });
+                const data = await res.json();
+                setCount(data?.quantity);
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         fetchCount();
