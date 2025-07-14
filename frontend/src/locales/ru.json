@@ -82,5 +82,6 @@
     "email_placeholder": "Введите почту",
     "agreement_text": "Согласие на передачу и обработку",
     "agreement_link": "персональных данных",
-    "sms_placeholder": "Введите код из СМС"
+    "sms_placeholder": "Введите код из СМС",
+    "sms_error": "Неверный код"
 }

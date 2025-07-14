@@ -77,6 +77,8 @@ export function VoteForm() {
 
         if (res.status === 200) {
             router.push('/main/thank-you');
+        } else {
+            smsForm.setError('code', { type: 'custom', message: t('sms_error') });
         }
     };
 
