@@ -38,7 +38,7 @@ export default function ScrollToTopButton() {
         <button
             type="button"
             onClick={scrollToTop}
-            className="fixed bottom-6 bg-[#263796] hover:bg-[#1e2a7a] text-white right-6 p-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 z-50"
+            className="fixed bottom-6 bg-[#263796] hover:bg-[#1e2a7a] text-white right-6 p-3 rounded-full shadow-lg transition-all duration-300 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 z-50 cursor-pointer"
             aria-label="На вверх"
         >
             <ChevronUp className="h-6 w-6" />

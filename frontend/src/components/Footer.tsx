@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { useTranslation } from 'react-i18next';
 import { LangSwitch } from './LangSwitch';
+import Logo from './Logo';
 
 export function Footer() {
     const { t } = useTranslation();
@@ -11,11 +12,15 @@ export function Footer() {
     return (
         <footer className="bg-[#F2F2F2] py-6 mt-auto">
             <div className="px-4 max-w-7xl m-auto">
-                <div className="flex flex-wrap md:flex-nowrap gap-6 md:justify-end mb-4">
-                    <Link href="/main#petition">{t('header_link.1')}</Link>
-                    <Link href="/main#how-it-works">{t('header_link.2')}</Link>
-                    <Link href="/main/status">{t('header_link.3')}</Link>
-                    {/* <Link href="/main">{t('header_link.4')}</Link> */}
+                <div className="flex flex-wrap md:flex-nowrap justify-between mb-4">
+                    <Logo className="mb-4" />
+                    <div className="flex flex-wrap md:flex-nowrap gap-6 md:justify-end">
+                        <Link href="/main#petition">{t('header_link.1')}</Link>
+                        <Link href="/main#how-it-works">{t('header_link.2')}</Link>
+                        <Link href="/main/status">{t('header_link.3')}</Link>
+                        {/* <Link href="/main">{t('header_link.4')}</Link> */}
+                        <Link href="/main/privacy-policy">{t('header_link.5')}</Link>
+                    </div>
                 </div>
                 <div className="flex justify-between">
                     <div className="gap-2 hidden md:flex">
