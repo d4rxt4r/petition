@@ -121,14 +121,14 @@ async def verify_sms(
         raise HTTPException(400, "Код неверен, истёк или превышено число попыток")
 
     try:
-        votings = await voting_repo.get_all()
-        voting = votings[0]
+        voting = (await voting_repo.get_all())[0]
+        async with voting_repo.db_session.begin():
+            await voting_repo.db_session.execute(
+                update(Voting)
+                .where(Voting.id == voting.id)
+                .values(fake_quantity=Voting.fake_quantity + 1)
+            )
 
-        await voting_repo.db_session.execute(
-            update(Voting)
-            .where(Voting.id == voting.id)
-            .values(fake_quantity=Voting.fake_quantity + 1)
-        )
     except Exception:
         logger.error("Не удалось сделать инкримент")
     return {"status": "ok"}
