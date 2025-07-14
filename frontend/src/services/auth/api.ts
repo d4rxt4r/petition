@@ -34,7 +34,7 @@ class AuthApi extends BaseApi {
      * Функция регистрации пользователя в системе.
      */
     public async login(data: types.LoginData): Promise<any> {
-        const response = await this.post('/auth', data);
+        const response = await this.post('/auth/login', data);
         return response;
     }
 

@@ -1,8 +1,8 @@
-import type {AxiosError, InternalAxiosRequestConfig} from 'axios';
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 export const http = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_DEVELOPMENT_HOST ?? 'http://localhost:8000',
+    baseURL: '/api',
     withCredentials: true,
     xsrfCookieName: 'csrftoken',
     xsrfHeaderName: 'X-CSRFToken',
