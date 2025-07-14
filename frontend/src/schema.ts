@@ -5,7 +5,9 @@ export const VoteFormSchema = z.object({
     phone: z.e164({
         error: 'Некорректный номер телефона',
     }),
-    agreement: z.literal(true),
+    agreement: z.literal(true, {
+        error: 'Пожалуйста, согласитесь с условиями',
+    }),
     email: z.string({
         error: 'Некорректный email',
     }).max(0).or(z.string({
@@ -13,6 +15,9 @@ export const VoteFormSchema = z.object({
     }).email({
         error: 'Некорректный email',
     })),
+    captcha: z.string().nonempty({
+        message: 'Пожалуйста, пройдите проверку',
+    }),
 });
 
 export type VoteFormData = z.infer<typeof VoteFormSchema>;
