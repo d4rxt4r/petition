@@ -1,3 +1,5 @@
+'use client';
+
 import { env } from 'next-runtime-env';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -42,7 +44,7 @@ export function SignCounter({ accentBackground, invert, className }: SignCounter
         <div className={cn('rounded-lg py-3 px-4 md:px-10', accentBackground && 'bg-white', invert && 'bg-[#263796]', className)}>
             <span className={cn('text-3xl md:text-6xl font-semibold flex gap-2 items-center', invert && 'text-white')}>
                 <Image src={invert ? '/dot-small-invert.svg' : '/dot-small.svg'} alt="sign" width={20} height={20} />
-                {count || <Skeleton className="w-[80] md:w-[150] h-8 md:h-14" />}
+                {count ?? <Skeleton className="w-[80] md:w-[150] h-8 md:h-14" />}
             </span>
             <p className={cn('md:text-right text-sm md:text-lg', invert && 'text-white')}>
                 {t('counter_text')}

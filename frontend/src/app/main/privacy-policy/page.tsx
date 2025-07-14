@@ -2,6 +2,8 @@
 
 import { useTranslation } from 'react-i18next';
 
+import '@/i18n';
+
 export default function PrivacyPolicy() {
     const { t } = useTranslation();
 

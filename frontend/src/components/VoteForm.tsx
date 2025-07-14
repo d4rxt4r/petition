@@ -1,3 +1,5 @@
+'use client';
+
 import type { SMSFormData, VoteFormData } from '@/schema';
 import { SmartCaptcha } from '@yandex/smart-captcha';
 import { env } from 'next-runtime-env';
