@@ -10,7 +10,9 @@ export const VoteFormSchema = z.object({
     }),
     email: z.string({
         error: 'Некорректный email',
-    }).max(0).or(z.string({
+    }).max(0, {
+        error: 'Некорректный email',
+    }).or(z.string({
         error: 'Некорректный email',
     }).email({
         error: 'Некорректный email',

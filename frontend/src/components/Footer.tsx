@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { LangSwitch } from './LangSwitch';
 import Logo from './Logo';
 
+import '@/i18n';
+
 export function Footer() {
     const { t } = useTranslation();
 

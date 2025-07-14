@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Language } from '@/enums';
 import { cn } from '@/lib/utils';
 
+import '@/i18n';
+
 export function LangSwitch() {
     const { i18n } = useTranslation();
 

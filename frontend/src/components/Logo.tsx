@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
+import '@/i18n';
+
 export default function Logo({ className }: { className?: string }) {
     const { t } = useTranslation();
 

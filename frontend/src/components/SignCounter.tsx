@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
+import '@/i18n';
+
 interface SignCounterProps {
     accentBackground?: boolean;
     className?: string;
@@ -16,7 +18,7 @@ interface SignCounterProps {
 export function SignCounter({ accentBackground, invert, className }: SignCounterProps) {
     const { t } = useTranslation();
 
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(null);
 
     useEffect(() => {
         const controller = new AbortController();

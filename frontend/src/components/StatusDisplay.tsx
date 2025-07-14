@@ -6,6 +6,8 @@ import { SignCounter } from '@/components/SignCounter';
 import { PetitionStatus } from '@/enums';
 import { cn } from '@/lib/utils';
 
+import '@/i18n';
+
 interface PetitionStatusProps {
     status: PetitionStatus;
 }
