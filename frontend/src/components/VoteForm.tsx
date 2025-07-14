@@ -35,7 +35,7 @@ export function VoteForm() {
     });
 
     const [confirmedPhone, setConfirmedPhone] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(true);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const onSubmit = async (values: VoteFormData) => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/validate' : '/api/vote/validate';
@@ -83,8 +83,8 @@ export function VoteForm() {
     if (showConfirmation) {
         return (
             <Form {...smsForm}>
-                <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 md:min-h-[818px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
-                    <div className="text-3xl md:text-5xl font-semibold mb-12">
+                <form onSubmit={smsForm.handleSubmit(onSubmitSMS)} className="flex flex-col flex-1 md:min-h-[714px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8">
+                    <div className="text-3xl md:text-5xl font-semibold mb-10">
                         {t('sms_header')}
                     </div>
                     <div className="flex flex-col gap-4 mb-10">
@@ -101,6 +101,9 @@ export function VoteForm() {
                             )}
                         />
                     </div>
+                    <button type="submit" className="mt-auto cursor-pointer rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-4 md:py-6">
+                        {t('sign_petition')}
+                    </button>
                 </form>
             </Form>
         );
@@ -108,8 +111,8 @@ export function VoteForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-7 md:py-[80]">
-                <div className="text-3xl md:text-5xl font-semibold mb-12">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8">
+                <div className="text-3xl md:text-5xl font-semibold mb-10">
                     {t('vote_header')}
                 </div>
                 <div className="flex flex-col gap-4 mb-10">
