@@ -13,6 +13,7 @@ from src.vote.schemas import (
     SmsVerifyBody,
     UserCreate,
     ValidateVote,
+    VotingRead,
 )
 
 from src.core.sms_aero import send_code
@@ -75,14 +76,13 @@ async def validate_vote(
             try:
                 user: User | None = await db.scalar(stmt)
             except PendingRollbackError:
-                # сессия «сломана» → откатываем и пересоздаём
                 await db.rollback()
                 logger.error("Session in FAILED state, rolled back")
                 raise HTTPException(500, "DB rollback needed")
-            except DBAPIError as exc:  # сетевые / протокол PG
+            except DBAPIError as exc:
                 logger.exception("Low-level DB error")
                 raise HTTPException(502, "Database unavailable")
-            except SQLAlchemyError as exc:  # остальные ORM-ошибки
+            except SQLAlchemyError as exc:
                 logger.exception("ORM error")
                 raise HTTPException(500, "Query error")
 
@@ -96,30 +96,27 @@ async def validate_vote(
                     )
                 )
 
-            # 3.3 Создаём/переотправляем код
             logger.info("Создаем смс верификацию")
             code = await sms_repo.create_or_resend(phone, user.id)
 
             logger.info("Смс верификацию создана")
 
-            # 3.4 Если уже было подтверждено — прерываемся без отправки SMS
             if code is None:
-                return {"status": "already_verified", "host": result.host}
+                raise HTTPException(
+                    status_code=400,
+                    detail={"status": "already_verified", "host": result.host},
+                )
 
             logger.info("Отправляем смс")
-            # 3.5 Пытаемся отправить SMS (может выбросить исключение)
             try:
                 send_code(phone, code)
             except Exception as exc:
                 logger.exception("SMS sending failed")
                 raise HTTPException(502, "SMS provider error")
 
-        # 4. Транзакция успешно завершена
         return {"status": "sms_sent", "host": result.host}
 
     except Exception:
-        # Любая ошибка ⇒ rollback (контекст `begin()` сделает это) + 500
-        # Логи пишем отдельно, детали клиенту не раскрываем
         raise HTTPException(status_code=500, detail="Server error")
 
 
@@ -131,5 +128,18 @@ async def verify_sms(body: SmsVerifyBody, repo: SmsRepoDep):
     return {"status": "ok"}
 
 
-# @routers.get("/vote_info")
-# async def vote_counts(repo: VotingRepoDep):
+@router.get("/vote_info")
+async def vote_counts(repo: VotingRepoDep) -> VotingRead:
+    votings = await repo.get_all()
+    if not votings:
+        raise HTTPException(status_code=404, detail="No voting campaigns found")
+
+    voting = votings[0]
+    quantity = voting.real_quantity if voting.show_real else voting.fake_quantity
+
+    return VotingRead(
+        start_date=voting.start_date,
+        end_date=voting.end_date,
+        quantity=quantity,
+        status=voting.status,
+    )
