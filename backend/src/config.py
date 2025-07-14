@@ -24,15 +24,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
 
-class RadisCacheSettings(BaseSettings):
-    REDIS_HOST: str = "localhost"
-    REDIS_PORT: int = 6379
-    REDIS_DB: int = 0
-    CACHE_TTL: int = 3600 * 24
-
-    model_config = SettingsConfigDict(extra="ignore")
-
-
 settings = Settings()  # pyright: ignore
 
 
