@@ -13,6 +13,8 @@ import { SMSFormSchema, VoteFormSchema } from '@/schema';
 import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form';
 import { PhoneInput } from './ui/phone-input';
 
+import '@/i18n';
+
 const defaultValues = {
     fullName: '',
     phone: '',
@@ -43,48 +45,52 @@ export function VoteForm() {
 
     const onSubmit = async (values: VoteFormData) => {
         const apiPath
-      = NEXT_PUBLIC_ENV === 'dev'
-          ? 'http://localhost/api/vote/validate'
-          : '/api/vote/validate';
+            = NEXT_PUBLIC_ENV === 'dev'
+                ? 'http://localhost/api/vote/validate'
+                : '/api/vote/validate';
         const { full_name, email, phone_number, token } = values;
 
-        const res = await fetch(apiPath, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                full_name,
-                email,
-                phone_number,
-                token,
-            }),
-        });
+        try {
+            const res = await fetch(apiPath, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    full_name,
+                    email,
+                    phone_number,
+                    token,
+                }),
+            });
 
-        if (res.status === 200) {
-            setConfirmedPhone(phone_number);
-            setShowConfirmation(true);
-        } else {
-            const data = await res.json();
-            if (data?.status === 'already_verified') {
-                form.setError('phone_number', {
-                    type: 'custom',
-                    message: t('phone_error'),
-                });
+            if (res.status === 200) {
+                setConfirmedPhone(phone_number);
+                setShowConfirmation(true);
             } else {
-                form.setError('agreement', {
-                    type: 'custom',
-                    message: t('vote_error'),
-                });
+                const data = await res.json();
+                if (data?.status === 'already_verified') {
+                    form.setError('phone_number', {
+                        type: 'custom',
+                        message: t('phone_error'),
+                    });
+                } else {
+                    form.setError('agreement', {
+                        type: 'custom',
+                        message: t('vote_error'),
+                    });
+                }
             }
+        } catch (error) {
+            console.error(error);
         }
     };
 
     const onSubmitSMS = async (values: SMSFormData) => {
         const apiPath
-      = NEXT_PUBLIC_ENV === 'dev'
-          ? 'http://localhost/api/vote/verify_sms'
-          : '/api/vote/verify_sms';
+            = NEXT_PUBLIC_ENV === 'dev'
+                ? 'http://localhost/api/vote/verify_sms'
+                : '/api/vote/verify_sms';
         const { code } = values;
 
         const res = await fetch(apiPath, {
