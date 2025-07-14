@@ -10,3 +10,8 @@ class AdminRead(BaseModel):
     email: EmailStr
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RegisterForm(BaseModel):
+    email: EmailStr
+    password: str
