@@ -57,6 +57,12 @@ export function VoteForm() {
         if (res.status === 200) {
             setConfirmedPhone(phone_number);
             setShowConfirmation(true);
+        } else {
+            // TOdo: token error or phone error
+            form.setError('agreement', {
+                type: 'custom',
+                message: t('vote_error'),
+            });
         }
     };
 

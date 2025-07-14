@@ -83,5 +83,6 @@
     "agreement_text": "Consimțământ pentru transfer și prelucrare",
     "agreement_link": "date personale",
     "sms_placeholder": "Introduceți codul din SMS",
-    "sms_error": "Cod de neuitat"
+    "sms_error": "Cod de neuitat",
+    "vote_error": "A apărut o eroare la trimiterea datelor"
 }
