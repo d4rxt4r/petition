@@ -10,6 +10,7 @@ import { SignCounter } from '@/components/SignCounter';
 import { PetitionStatusDisplay } from '@/components/StatusDisplay';
 import { VoteForm } from '@/components/VoteForm';
 import { PetitionStatus } from '@/enums';
+
 import '@/i18n';
 
 export default function MainPage() {

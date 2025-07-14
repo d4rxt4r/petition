@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -52,10 +51,7 @@ export function LoginForm({
         <div className={cn('flex flex-col gap-6', className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-2xl">Логин</CardTitle>
-                    <CardDescription>
-                        Введите email
-                    </CardDescription>
+                    <CardTitle className="text-2xl">Форма авторизации</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit}>
@@ -73,6 +69,7 @@ export function LoginForm({
                                 />
                             </div>
                             <div className="grid gap-2">
+                                <Label htmlFor="email">Пароль</Label>
                                 <Input
                                     id="password"
                                     type="password"
