@@ -88,9 +88,7 @@ async def validate_vote(
 
             logger.info("Отправляем смс")
             # 3.5 Пытаемся отправить SMS (может выбросить исключение)
-            await send_code(
-                phone, code
-            )
+            await send_code(phone, code)
 
         # 4. Транзакция успешно завершена
         return {"status": "sms_sent", "host": result.host}
@@ -109,7 +107,5 @@ async def verify_sms(body: SmsVerifyBody, repo: SmsRepoDep):
     return {"status": "ok"}
 
 
-@routers.get("/vote_info")
-async def vote_counts(repo: VotingRepoDep):
-    
-
+# @routers.get("/vote_info")
+# async def vote_counts(repo: VotingRepoDep):
