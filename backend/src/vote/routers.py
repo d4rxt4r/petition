@@ -1,7 +1,6 @@
 from typing import IO, Optional
 from io import BytesIO
 from fastapi import APIRouter, HTTPException, Request
-from sqlalchemy.exc import SQLAlchemyError, DBAPIError, PendingRollbackError
 from fastapi.responses import StreamingResponse
 import requests
 from sqlalchemy import select
@@ -11,7 +10,7 @@ import pandas as pd
 from src.config import settings
 from src.dependencies import AuthDep, DBSessionDep
 from src.vote.dependencies import SmsRepoDep, UserRepoDep, VotingRepoDep
-from src.vote.models import SmsVerification, User
+from src.vote.models import User
 from src.vote.schemas import (
     CaptchaValidateResp,
     SmsVerifyBody,
@@ -129,7 +128,7 @@ async def vote_counts(
         raise HTTPException(status_code=404, detail="No voting campaigns found")
 
     voting = votings[0]
-    users = await user_repo.get_all()
+    users = await user_repo.get_all_valid()
     real_quantity = len(users)
     quantity = real_quantity if voting.show_real else voting.fake_quantity
 
@@ -143,6 +142,7 @@ async def vote_counts(
 
 @router.get("/dash_vote_info")
 async def vote_info(
+    pyload: AuthDep,
     voting_repo: VotingRepoDep,
     user_repo: UserRepoDep,
 ) -> VotingUpdate:
@@ -167,6 +167,7 @@ async def vote_info(
 
 @router.get("/all_user")
 async def get_all_user(
+    pyload: AuthDep,
     user_repo: UserRepoDep,
 ) -> list[UserRead]:
     return [UserRead.model_validate(obj) for obj in await user_repo.get_all()]
@@ -174,6 +175,7 @@ async def get_all_user(
 
 @router.post("/update_user")
 async def get_update_user(
+    pyload: AuthDep,
     user_repo: UserRepoDep,
     form_data: UserUpdate,
 ) -> Optional[UserUpdate]:
@@ -184,6 +186,7 @@ async def get_update_user(
 
 @router.post("/update_vote")
 async def update_vote(
+    pyload: AuthDep,
     voting_repo: VotingRepoDep,
     form_data: VotingUpdate,
 ) -> Optional[VotingUpdate]:
@@ -193,8 +196,10 @@ async def update_vote(
 
 
 @router.get("/export_users_excel", response_class=StreamingResponse)
-async def export_users_excel(user_repo: UserRepoDep) -> StreamingResponse:
-    # 1. Получаем пользователей
+async def export_users_excel(
+    pyload: AuthDep,
+    user_repo: UserRepoDep,
+) -> StreamingResponse:
     users = await user_repo.get_all()
     data = [
         {
@@ -210,7 +215,7 @@ async def export_users_excel(user_repo: UserRepoDep) -> StreamingResponse:
     # 2. DataFrame -> Excel в память
     df = pd.DataFrame(data)
     buffer: IO[bytes] = BytesIO()  # достаточно IO[bytes] для Pyright
-    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+    with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:  # pyright: ignore
         df.to_excel(writer, index=False)
     buffer.seek(0)
 

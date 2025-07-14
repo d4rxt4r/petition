@@ -41,7 +41,6 @@ class User(Base):
 
     email: Mapped[Optional[str]] = mapped_column(
         CITEXT(),
-        unique=True,
         nullable=True,
     )
 

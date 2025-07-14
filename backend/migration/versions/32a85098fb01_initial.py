@@ -74,7 +74,6 @@ def upgrade() -> None:
             comment="Время последнего обновления",
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("email"),
         sa.UniqueConstraint("phone_number", name="uq_user_phone"),
     )
     op.create_table(
