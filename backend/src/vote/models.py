@@ -37,10 +37,7 @@ class User(Base):
 
     id: Mapped[UUID] = uuid_pk()
 
-    first_name: Mapped[Optional[str]] = mapped_column(CHAR(128))
-    last_name: Mapped[Optional[str]] = mapped_column(CHAR(128))
-    patronymic: Mapped[Optional[str]] = mapped_column(CHAR(128))
-
+    full_name: Mapped[Optional[str]] = mapped_column(CHAR(255))
     email: Mapped[str] = mapped_column(
         CITEXT(),
         unique=True,

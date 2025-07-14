@@ -1,20 +1,22 @@
 from datetime import datetime
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, field_serializer
+from pydantic import BaseModel, ConfigDict, Field, constr, field_serializer
 
 from vote.models import VoteStatus
 
 
 class UserCreate(BaseModel):
-    first_name: str
-    last_name: str
-    patronymuic: str
+    full_name: str
     email: str
-    valid_vote: bool = True
 
     model_config = ConfigDict(populate_by_name=True)
+
+
+class ValidateVote(UserCreate):
+    phone_number: str
+    token: str
 
 
 class UserUpdate(UserCreate):
@@ -62,10 +64,6 @@ class SmsVerificationRead(SmsVerificationUpdate):
     pass
 
 
-class ValidateVote(UserCreate):
-    token: str
-
-
 class CaptchaValidateResp(BaseModel):
     status: str
     message: str
@@ -76,3 +74,24 @@ class CaptchaValidateResp(BaseModel):
     @field_serializer("message", "host")
     def none_to_empty(self, value: Optional[str], info) -> str:
         return value or ""
+
+
+Phone = Annotated[
+    str,
+    Field(
+        pattern=r"^(?:\+7\d{10}|\+373\d{8})$",
+        description="Только +7xxxxxxxxxx или +373xxxxxxxx",
+    ),
+]
+Code6 = Annotated[
+    str,
+    Field(
+        pattern=r"^\d{6}$",
+        description="Шестизначный цифровой код",
+    ),
+]
+
+
+class SmsVerifyBody(BaseModel):
+    phone: Phone
+    code: Code6
