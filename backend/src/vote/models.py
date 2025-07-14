@@ -4,12 +4,13 @@ from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import (
+    VARCHAR,
     Boolean,
     CHAR,
-    CheckConstraint,
     DateTime,
+    ForeignKey,
     Integer,
-    Index,
+    UniqueConstraint,
     text,
 )
 from sqlalchemy.dialects.postgresql import CITEXT, ENUM, UUID as PG_UUID
@@ -33,18 +34,26 @@ def tz_now() -> datetime:
 
 
 class User(Base):
-    """Пользователь, который может отдавать голос / подпись."""
+    """Пользователь, фиксируем телефон как уникальный."""
 
     id: Mapped[UUID] = uuid_pk()
 
-    full_name: Mapped[Optional[str]] = mapped_column(CHAR(255))
-    email: Mapped[str] = mapped_column(
+    full_name: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
+
+    email: Mapped[Optional[str]] = mapped_column(
         CITEXT(),
         unique=True,
+        nullable=True,
+    )
+
+    phone_number: Mapped[str] = mapped_column(
+        VARCHAR(20),
         nullable=False,
     )
 
     valid_vote: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    __table_args__ = (UniqueConstraint("phone_number", name="uq_user_phone"),)
 
     sms_verifications: Mapped[List["SmsVerification"]] = relationship(
         back_populates="user",
@@ -53,27 +62,19 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<User {self.id} {self.email!s}>"
+        return f"<User {self.id} {self.phone_number}>"
 
 
 class SmsVerification(Base):
-    """Одноразовый код подтверждения, привязанный к пользователю."""
-
-    __table_args__ = (
-        CheckConstraint("char_length(code) = 6", name="chk_code_length"),
-        CheckConstraint("phone_number ~ '^\\+[1-9][0-9]{1,14}$'", name="chk_e164"),
-        Index("ix_sms_not_verified", "is_verified", "expires_at"),
-    )
+    """Одноразовый код подтверждения, может быть несколько записей на одного User."""
 
     id: Mapped[UUID] = uuid_pk()
 
-    phone_number: Mapped[str] = mapped_column(CHAR(20), nullable=False)
-    code: Mapped[str] = mapped_column(CHAR(6), nullable=False)
+    phone_number: Mapped[str] = mapped_column(VARCHAR(20), nullable=False)
+    code: Mapped[str] = mapped_column(VARCHAR(6), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=tz_now,
-        nullable=False,
+        DateTime(timezone=True), default=tz_now, nullable=False
     )
     expires_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
@@ -82,8 +83,10 @@ class SmsVerification(Base):
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
+    # связь с пользователем (FK в БД создаст Alembic)
     user_id: Mapped[UUID] = mapped_column(
         PG_UUID(as_uuid=True),
+        ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

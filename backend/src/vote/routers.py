@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
+from sqlalchemy.exc import SQLAlchemyError, DBAPIError, PendingRollbackError
 import requests
 from sqlalchemy import select
 from starlette.responses import JSONResponse
@@ -53,7 +54,10 @@ async def validate_vote(
     if resp.status_code != 200:
         raise HTTPException(status_code=502, detail="Captcha service error")
 
+    logger.info(resp.json())
+
     result = CaptchaValidateResp.model_validate(resp.json())
+
     if result.status != "ok":
         return JSONResponse(
             status_code=400,
@@ -64,23 +68,39 @@ async def validate_vote(
     phone = form_data.phone_number  # pydantic гарантирует +7 / +373 формат
 
     try:
+        logger.info("Начало записи в базу")
         async with db.begin():
-            # 3.1 Ищем пользователя через SmsVerification → User
-            stmt = (
-                select(User)
-                .join(SmsVerification, SmsVerification.user_id == User.id)
-                .where(SmsVerification.phone_number == phone)
-            )
-            user: User | None = await db.scalar(stmt)
+            logger.info("Ищем пользователя в базе")
+            stmt = select(User).where(User.phone_number == phone)
+            try:
+                user: User | None = await db.scalar(stmt)
+            except PendingRollbackError:
+                # сессия «сломана» → откатываем и пересоздаём
+                await db.rollback()
+                logger.error("Session in FAILED state, rolled back")
+                raise HTTPException(500, "DB rollback needed")
+            except DBAPIError as exc:  # сетевые / протокол PG
+                logger.exception("Low-level DB error")
+                raise HTTPException(502, "Database unavailable")
+            except SQLAlchemyError as exc:  # остальные ORM-ошибки
+                logger.exception("ORM error")
+                raise HTTPException(500, "Query error")
 
-            # 3.2 Если не найден — создаём
+            logger.info("Поиск пользователя завершен успешно")
             if user is None:
                 user = await user_repo.create(
-                    UserCreate(full_name=form_data.full_name, email=form_data.email)
+                    UserCreate(
+                        phone_number=form_data.phone_number,
+                        full_name=form_data.full_name,
+                        email=form_data.email,
+                    )
                 )
 
             # 3.3 Создаём/переотправляем код
+            logger.info("Создаем смс верификацию")
             code = await sms_repo.create_or_resend(phone, user.id)
+
+            logger.info("Смс верификацию создана")
 
             # 3.4 Если уже было подтверждено — прерываемся без отправки SMS
             if code is None:
@@ -88,7 +108,11 @@ async def validate_vote(
 
             logger.info("Отправляем смс")
             # 3.5 Пытаемся отправить SMS (может выбросить исключение)
-            await send_code(phone, code)
+            try:
+                send_code(phone, code)
+            except Exception as exc:
+                logger.exception("SMS sending failed")
+                raise HTTPException(502, "SMS provider error")
 
         # 4. Транзакция успешно завершена
         return {"status": "sms_sent", "host": result.host}

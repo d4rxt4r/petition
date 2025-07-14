@@ -16,6 +16,8 @@ from src.vote.schemas import (
     VotingUpdate,
 )
 
+from loguru import logger
+
 
 class UserRepo(GenericCRUDRepository[User, UserCreate, UserUpdate]):
     model = User
@@ -43,45 +45,50 @@ class SmsVerificationRepo(
         return f"{randbelow(1_000_000):06d}"
 
     async def create_or_resend(self, phone: str, user_id: UUID) -> str | None:
-        """
-        • None — уже верифицировано, код не шлём.
-        • str   — новый/обновлённый код для отправки.
-        """
         now = datetime.now(timezone.utc)
-
-        async with self.db_session.begin():  # единая транзакция
+        logger.info(f"create_or_resend start: phone={phone}, user_id={user_id}")
+        try:
+            logger.debug("Selecting existing verification")
             verif = await self.db_session.scalar(
                 select(SmsVerification).where(SmsVerification.phone_number == phone)
             )
+            logger.debug(f"Selected verif: {verif!r}")
 
             if verif and verif.is_verified:
+                logger.info("Already verified, returning None")
                 return None
 
             code = self._gen_code()
             expires = now + self.CODE_TTL
+            logger.debug(f"Generated code={code}, expires={expires}")
 
             if verif:
-                await self.db_session.execute(
+                logger.debug("Updating existing SmsVerification")
+                res = await self.db_session.execute(
                     update(SmsVerification)
                     .where(SmsVerification.id == verif.id)
                     .values(
-                        code=code,
-                        expires_at=expires,
-                        attempts=0,
-                        is_verified=False,
+                        code=code, expires_at=expires, attempts=0, is_verified=False
                     )
                 )
+                logger.debug(f"Update result: {res.rowcount} rows")
             else:
-                self.db_session.add(
-                    SmsVerification(
-                        phone_number=phone,
-                        code=code,
-                        expires_at=expires,
-                        user_id=user_id,
-                    )
+                logger.debug("Creating new SmsVerification")
+                sms = SmsVerification(
+                    phone_number=phone,
+                    code=code,
+                    expires_at=expires,
+                    user_id=user_id,
                 )
+                self.db_session.add(sms)
+                logger.debug(f"Added new entity: {sms!r}")
 
-        return code
+            logger.info("create_or_resend complete")
+            return code
+
+        except Exception as exc:
+            logger.error(f"Error in create_or_resend: {exc!r}", exc_info=True)
+            raise
 
     async def verify_code(self, phone: str, code: str) -> bool:
         """

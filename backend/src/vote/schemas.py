@@ -8,6 +8,7 @@ from src.vote.models import VoteStatus
 
 
 class UserCreate(BaseModel):
+    phone_number: str
     full_name: str
     email: str
 
@@ -15,7 +16,6 @@ class UserCreate(BaseModel):
 
 
 class ValidateVote(UserCreate):
-    phone_number: str
     token: str
 
 
@@ -71,7 +71,7 @@ class SmsVerificationRead(SmsVerificationUpdate):
 
 class CaptchaValidateResp(BaseModel):
     status: str
-    message: str
+    message: Optional[str]
     host: Optional[str]
 
     model_config = ConfigDict(populate_by_name=True)
