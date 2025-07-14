@@ -38,6 +38,8 @@ services:
     env_file:
       - ./.envs/.env.backend.dev
       - ./.envs/.env.postgres.dev
+    ports:
+      - "8000:8000"
     volumes:
       - ./backend:/app
     depends_on:
