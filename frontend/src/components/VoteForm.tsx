@@ -48,7 +48,7 @@ export function VoteForm() {
     const handleCaptchaReset = () => setResetCaptcha((prev) => prev + 1);
 
     const [confirmedPhone, setConfirmedPhone] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(true);
 
     const onSubmit = async (values: VoteFormData) => {
         const apiPath
@@ -156,7 +156,7 @@ export function VoteForm() {
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         className="h-6 w-6 p-0 rounded-full hover:bg-gray-200"
-                                                                        type="button" // Важно: предотвращаем отправку формы
+                                                                        type="button"
                                                                     >
                                                                         <HelpCircle className="h-4 w-4 text-gray-500" />
                                                                     </Button>
@@ -168,7 +168,7 @@ export function VoteForm() {
                                                             </TooltipContent>
                                                         </Tooltip>
 
-                                                        <PopoverContent className="w-80 p-6" align="end">
+                                                        <PopoverContent className="w-80 p-6" align="center">
                                                             <div className="space-y-4">
                                                                 <div className="flex items-center gap-2">
                                                                     <Mail className="h-5 w-5 text-blue-600" />
