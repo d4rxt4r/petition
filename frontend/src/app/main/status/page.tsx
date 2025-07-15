@@ -34,7 +34,7 @@ export default function StatusPage() {
 
         fetchStatus();
 
-        return () => controller.abort();
+        return () => controller.abort('');
     }, []);
 
     return (

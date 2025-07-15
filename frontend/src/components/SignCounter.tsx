@@ -39,7 +39,7 @@ export function SignCounter({ accentBackground, invert, className }: SignCounter
 
         fetchCount();
 
-        return () => controller.abort();
+        return () => controller.abort('');
     }, []);
 
     return (

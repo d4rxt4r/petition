@@ -24,7 +24,7 @@ type PhoneInputProps = Omit<
 function InputComponent({ ref, className, ...props }: React.ComponentProps<'input'> & { ref?: React.RefObject<HTMLInputElement | null> }) {
     return (
         <input
-            className={cn('bg-white p-6 rounded-2xl rounded-l-none text-lg min-w-0 w-full', className)}
+            className={cn('bg-white p-6 pl-3 md:pl-6 rounded-2xl rounded-l-none text-lg min-w-0 w-full', className)}
             {...props}
             ref={ref}
         />
@@ -56,7 +56,7 @@ function CountrySelect({
                 <Button
                     type="button"
                     variant="secondary"
-                    className="py-[38px!important] px-[24px!important] shadow-none bg-white flex rounded-2xl rounded-r-none border-r-0 focus:z-10"
+                    className="py-[38px!important] px-[24px!important] pr-[12px!important] md:pr-[24px!important] shadow-none bg-white flex rounded-2xl rounded-r-none border-r-0 focus:z-10"
                     disabled={disabled}
                 >
                     <FlagComponent
