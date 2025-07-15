@@ -17,10 +17,10 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { SelectExt } from './ui/select-ext';
 import { ToggleExt } from './ui/toggle-ext';
 
-const router = useRouter()
 
 async function fetchTableData(controller: AbortController) {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
+    const router = useRouter()
     const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/all_user' : '/api/vote/all_user';
     try {
         const res = await fetch(apiPath, {
@@ -40,7 +40,7 @@ const emptyArray: any[] = [];
 
 export function Dashboard() {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
-
+    const router = useRouter()
     const [petitionState, setPetitionState] = useState<any>(() => { });
 
     useEffect(() => {
