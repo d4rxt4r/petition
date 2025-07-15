@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/lib/utils';
+import { cn, pluralize } from '@/lib/utils';
 
 import '@/i18n';
 
@@ -17,6 +17,8 @@ interface SignCounterProps {
 
 export function SignCounter({ accentBackground, invert, className }: SignCounterProps) {
     const { t } = useTranslation();
+
+    const plurals = [t('counter_plural_1'), t('counter_plural_2'), t('counter_plural_3')];
 
     const [count, setCount] = useState(null);
 
@@ -49,7 +51,7 @@ export function SignCounter({ accentBackground, invert, className }: SignCounter
                 {count ?? <Skeleton className="w-[80] md:w-[150] h-8 md:h-14" />}
             </span>
             <p className={cn('md:text-right text-sm md:text-lg', invert && 'text-white')}>
-                {t('counter_text')}
+                {pluralize(count || 0, plurals)}
             </p>
         </div>
     );
