@@ -3,14 +3,14 @@ from io import BytesIO
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 import requests
-from sqlalchemy import select
+from sqlalchemy import select, update
 from starlette.responses import JSONResponse
 import pandas as pd
 
 from src.config import settings
 from src.dependencies import AuthDep, DBSessionDep
 from src.vote.dependencies import SmsRepoDep, UserRepoDep, VotingRepoDep
-from src.vote.models import User
+from src.vote.models import User, Voting
 from src.vote.schemas import (
     CaptchaValidateResp,
     SmsVerifyBody,
@@ -111,10 +111,26 @@ async def validate_vote(
 
 
 @router.post("/verify_sms")
-async def verify_sms(body: SmsVerifyBody, repo: SmsRepoDep):
+async def verify_sms(
+    body: SmsVerifyBody,
+    repo: SmsRepoDep,
+    voting_repo: VotingRepoDep,
+):
     ok = await repo.verify_code(body.phone, body.code)
     if not ok:
         raise HTTPException(400, "Код неверен, истёк или превышено число попыток")
+
+    try:
+        voting = (await voting_repo.get_all())[0]
+        await voting_repo.db_session.execute(
+            update(Voting)
+            .where(Voting.id == voting.id)
+            .values(fake_quantity=Voting.fake_quantity + 1)
+        )
+        await voting_repo.db_session.commit()
+
+    except Exception as exc:
+        logger.error(f"Не удалось сделать инкримент {exc}")
     return {"status": "ok"}
 
 
