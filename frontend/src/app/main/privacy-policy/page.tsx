@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
                 {t('privacy_policy_text.19')}
                 :
                 {' '}
-                <a href="mailto:moldovavote@yandex.ru">moldovavote@yandex.ru</a>
+                <a href="mailto:moldovavote@yandex.ru">moldovavote@mail.ru</a>
                 .
                 <br />
                 <br />

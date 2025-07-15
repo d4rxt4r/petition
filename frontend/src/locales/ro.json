@@ -87,5 +87,11 @@
     "agreement_link": "date personale",
     "sms_placeholder": "Introduceți codul din SMS",
     "sms_error": "Cod de neuitat",
-    "vote_error": "A apărut o eroare la trimiterea datelor"
+    "vote_error": "A apărut o eroare la trimiterea datelor",
+    "code_help_title": "Nu am primit codul",
+    "code_help_header": "Nu ai primit codul?",
+    "code_help_text.1": "Dacă nu ați primit un cod de confirmare, vă vom ajuta să votați manual.",
+    "code_help_text.2": "Vă rugăm să ne trimiteți datele dumneavoastră de contact la adresa noastră de e-mail:",
+    "code_help_text.3": "Specialiștii noștri vor procesa solicitarea dumneavoastră și vor introduce votul în sistem cât mai curând posibil.",
+    "code_help_btn": "Scrie prin email"
 }
