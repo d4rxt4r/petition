@@ -34,7 +34,7 @@ settings = Settings()  # pyright: ignore
 authx_config = AuthXConfig(
     JWT_SECRET_KEY=settings.JWT_SECRET_KEY,  # ваш секрет для JWT
     JWT_ALGORITHM="HS256",  # алгоритм подписи
-    JWT_ACCESS_TOKEN_EXPIRES=timedelta(minutes=30),  # жизнь access‑токена
+    JWT_ACCESS_TOKEN_EXPIRES=timedelta(days=3),  # жизнь access‑токена
     JWT_REFRESH_TOKEN_EXPIRES=timedelta(days=15),  # жизнь refresh‑токена
     JWT_TOKEN_LOCATION=["cookies"],  # искать токены именно в куки
     JWT_COOKIE_SECURE=True,  # Secure-флаг для куки (HTTPS)
