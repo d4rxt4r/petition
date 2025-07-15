@@ -56,7 +56,7 @@ export default function MainPage() {
                             <Image alt="flag" src="/img/flag.png" width={660} height={720} />
                             <SignCounter accentBackground className="absolute bottom-[10] left-[100] md:right-[100] md:bottom-[60]" />
                         </div>
-                        <p className="mb-4 md:mb-0 md:text-2xl">
+                        <p className="mb-4 md:text-2xl">
                             {t('jambo_description')}
                         </p>
 
