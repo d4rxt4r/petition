@@ -120,15 +120,9 @@ export default function MainPage() {
                 <p className="pb-4 md:pb-8">
                     {t('petition.p10')}
                 </p>
-                <div className="flex gap-6">
-                    <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
-                        <span className="font-semibold">{t('addressee')}</span>
-                        <p>{t('addressee_name')}</p>
-                    </div>
-                    {/* <div className="basis-[calc(50%-24px)] shrink-0 flex flex-col gap-2">
-                        <span className="font-semibold">{t('author')}</span>
-                        <p>{t('author_name')}</p>
-                    </div> */}
+                <div className="flex flex-col gap-4">
+                    <span className="font-semibold">{t('addressee')}</span>
+                    <p>{t('addressee_name')}</p>
                 </div>
             </main>
 
