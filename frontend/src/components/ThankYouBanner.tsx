@@ -19,11 +19,11 @@ export function ThankYouBanner() {
                     <div className="md:hidden basis-1/2 shrink-0 relative">
                         <Image alt="flag" src="/img/thank-you.png" width={660} height={720} />
                     </div>
-                    <p className="mb-6 md:mb-0 md:text-2xl">
+                    <p className="mb-6 md:text-2xl">
                         {t('thank_you_text')}
                     </p>
                     <div className="mt-auto flex flex-col gap-2 mb-14 md:mb-0">
-                        <button type="button" className="rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-6">{t('share')}</button>
+                        {/* <button type="button" className="rounded-2xl text-white font-semibold bg-linear-to-t from-[#1A2B87] to-[#4155C7] py-6">{t('share')}</button> */}
                         <Link href="/main" className="rounded-2xl text-black/50 text-center font-semibold bg-[#F2F2F2] py-6">{t('return')}</Link>
                     </div>
                 </div>

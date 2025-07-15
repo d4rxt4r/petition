@@ -69,7 +69,7 @@ export function Dashboard() {
 
         fetchCount();
 
-        return () => controller.abort();
+        return () => controller.abort('');
     }, []);
 
     const updateVoting = async () => {
@@ -112,7 +112,7 @@ export function Dashboard() {
             const data = await fetchTableData(controller);
             setTableData(data);
         })();
-        return () => controller.abort();
+        return () => controller.abort('');
     }, []);
 
     const onRemove = async (voteId: number) => {
