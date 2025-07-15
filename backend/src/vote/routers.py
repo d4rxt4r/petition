@@ -122,15 +122,15 @@ async def verify_sms(
 
     try:
         voting = (await voting_repo.get_all())[0]
-        async with voting_repo.db_session.begin():
-            await voting_repo.db_session.execute(
-                update(Voting)
-                .where(Voting.id == voting.id)
-                .values(fake_quantity=Voting.fake_quantity + 1)
-            )
+        await voting_repo.db_session.execute(
+            update(Voting)
+            .where(Voting.id == voting.id)
+            .values(fake_quantity=Voting.fake_quantity + 1)
+        )
+        await voting_repo.db_session.commit()
 
-    except Exception:
-        logger.error("Не удалось сделать инкримент")
+    except Exception as exc:
+        logger.error(f"Не удалось сделать инкримент {exc}")
     return {"status": "ok"}
 
 
