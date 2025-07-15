@@ -24,7 +24,7 @@ type PhoneInputProps = Omit<
 function InputComponent({ ref, className, ...props }: React.ComponentProps<'input'> & { ref?: React.RefObject<HTMLInputElement | null> }) {
     return (
         <input
-            className={cn('bg-white p-6 rounded-2xl rounded-l-none text-lg flex-1', className)}
+            className={cn('bg-white p-6 rounded-2xl rounded-l-none text-lg min-w-0', className)}
             {...props}
             ref={ref}
         />

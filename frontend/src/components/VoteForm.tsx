@@ -121,7 +121,7 @@ export function VoteForm() {
             <Form {...smsForm} key="sms-form">
                 <form
                     onSubmit={smsForm.handleSubmit(onSubmitSMS)}
-                    className="flex flex-col flex-1 md:min-h-[714px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8"
+                    className="flex flex-col flex-1 md:min-h-[714px] bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8 overflow-hidden"
                 >
                     <div className="text-3xl md:text-5xl font-semibold mb-10">
                         {t('sms_header')}
@@ -135,7 +135,7 @@ export function VoteForm() {
                                     <FormControl>
                                         <input
                                             {...field}
-                                            className="bg-white p-6 rounded-2xl text-lg"
+                                            className="bg-white p-6 rounded-2xl text-lg w-full"
                                             placeholder={t('sms_placeholder')}
                                             type="text"
                                             required
@@ -161,7 +161,7 @@ export function VoteForm() {
         <Form {...form} key="form">
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8"
+                className="flex flex-col flex-1 bg-[#F2F2F2] rounded-2xl px-6 md:px-8 py-8 overflow-hidden"
             >
                 <div className="text-3xl md:text-5xl font-semibold mb-10">
                     {t('vote_header')}
@@ -175,7 +175,7 @@ export function VoteForm() {
                                 <FormControl>
                                     <input
                                         {...field}
-                                        className="bg-white p-6 rounded-2xl text-lg"
+                                        className="bg-white p-6 rounded-2xl text-lg w-full"
                                         placeholder={t('fullName_placeholder')}
                                         type="text"
                                         required
@@ -197,6 +197,7 @@ export function VoteForm() {
                                         countries={['RU', 'MD']}
                                         defaultCountry="RU"
                                         international
+                                        className="w-full"
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -211,7 +212,7 @@ export function VoteForm() {
                                 <FormControl>
                                     <input
                                         {...field}
-                                        className="bg-white p-6 rounded-2xl text-lg"
+                                        className="bg-white p-6 rounded-2xl text-lg w-full"
                                         placeholder={t('email_placeholder')}
                                         type="email"
                                     />
@@ -249,7 +250,7 @@ export function VoteForm() {
                     control={form.control}
                     name="agreement"
                     render={({ field }) => (
-                        <FormItem className="mb-10">
+                        <FormItem className="mb-10 w-full">
                             <div className="flex gap-2 items-center">
                                 <FormControl>
                                     <input
