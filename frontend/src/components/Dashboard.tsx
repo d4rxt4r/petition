@@ -3,6 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { TrashIcon } from 'lucide-react';
 import { env } from 'next-runtime-env';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PetitionStatusOptions, TableFilterOptions } from '@/enums';
@@ -11,23 +12,20 @@ import { Checkbox } from './ui/checkbox';
 import { DataTable } from './ui/data-table';
 import { DatePicker } from './ui/date-picker';
 import { Input } from './ui/input';
-import { useRouter } from 'next/navigation';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { SelectExt } from './ui/select-ext';
 import { ToggleExt } from './ui/toggle-ext';
 
-
-async function fetchTableData(controller: AbortController) {
+async function fetchTableData(controller: AbortController, router: any) {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
-    const router = useRouter()
     const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/all_user' : '/api/vote/all_user';
     try {
         const res = await fetch(apiPath, {
             signal: controller.signal,
         });
         if (res.status === 422) {
-            router.push("/auth")
+            router.push('/auth');
         }
         const data = await res.json();
         return data;
@@ -40,7 +38,7 @@ const emptyArray: any[] = [];
 
 export function Dashboard() {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
-    const router = useRouter()
+    const router = useRouter();
     const [petitionState, setPetitionState] = useState<any>(() => { });
 
     useEffect(() => {
@@ -54,7 +52,7 @@ export function Dashboard() {
                     signal: controller.signal,
                 });
                 if (res.status === 422) {
-                    router.push("/auth")
+                    router.push('/auth');
                 }
                 const data = await res.json();
                 setPetitionState({
@@ -70,7 +68,7 @@ export function Dashboard() {
         fetchCount();
 
         return () => controller.abort('');
-    }, []);
+    }, [router]);
 
     const updateVoting = async () => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_vote' : '/api/vote/update_vote';
@@ -82,7 +80,7 @@ export function Dashboard() {
             body: JSON.stringify(petitionState),
         });
         if (res.status === 422) {
-            router.push("/auth")
+            router.push('/auth');
         }
         if (res.status === 200) {
             toast.success('Данные успешно обновлены');
@@ -109,11 +107,11 @@ export function Dashboard() {
     useEffect(() => {
         const controller = new AbortController();
         (async () => {
-            const data = await fetchTableData(controller);
+            const data = await fetchTableData(controller, router);
             setTableData(data);
         })();
         return () => controller.abort('');
-    }, []);
+    }, [router]);
 
     const onRemove = async (voteId: number) => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_user' : '/api/vote/update_user';
@@ -129,13 +127,13 @@ export function Dashboard() {
                 }),
             });
             if (res.status === 422) {
-                router.push("/auth")
+                router.push('/auth');
             }
             const data = await res.json();
             if (res.status === 200) {
                 toast.success('Данные успешно обновлены');
                 const controller = new AbortController();
-                const data = await fetchTableData(controller);
+                const data = await fetchTableData(controller, router);
                 setTableData(data);
             } else {
                 console.error(data);
@@ -150,7 +148,7 @@ export function Dashboard() {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/export_users_excel' : '/api/vote/export_users_excel';
         const res = await fetch(apiPath);
         if (res.status === 422) {
-            router.push("/auth")
+            router.push('/auth');
         }
         if (res.status === 200) {
             const blob = await res.blob();
