@@ -11,18 +11,24 @@ import { Checkbox } from './ui/checkbox';
 import { DataTable } from './ui/data-table';
 import { DatePicker } from './ui/date-picker';
 import { Input } from './ui/input';
+import { useRouter } from 'next/navigation';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { SelectExt } from './ui/select-ext';
 import { ToggleExt } from './ui/toggle-ext';
 
+
 async function fetchTableData(controller: AbortController) {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
+    const router = useRouter()
     const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/all_user' : '/api/vote/all_user';
     try {
         const res = await fetch(apiPath, {
             signal: controller.signal,
         });
+        if (res.status === 422) {
+            router.push("/auth")
+        }
         const data = await res.json();
         return data;
     } catch (e) {
@@ -34,7 +40,7 @@ const emptyArray: any[] = [];
 
 export function Dashboard() {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
-
+    const router = useRouter()
     const [petitionState, setPetitionState] = useState<any>(() => { });
 
     useEffect(() => {
@@ -47,6 +53,9 @@ export function Dashboard() {
                 const res = await fetch(apiPath, {
                     signal: controller.signal,
                 });
+                if (res.status === 422) {
+                    router.push("/auth")
+                }
                 const data = await res.json();
                 setPetitionState({
                     ...data,
@@ -72,7 +81,9 @@ export function Dashboard() {
             },
             body: JSON.stringify(petitionState),
         });
-
+        if (res.status === 422) {
+            router.push("/auth")
+        }
         if (res.status === 200) {
             toast.success('Данные успешно обновлены');
         } else {
@@ -117,6 +128,9 @@ export function Dashboard() {
                     valid_vote: false,
                 }),
             });
+            if (res.status === 422) {
+                router.push("/auth")
+            }
             const data = await res.json();
             if (res.status === 200) {
                 toast.success('Данные успешно обновлены');
@@ -135,6 +149,9 @@ export function Dashboard() {
     const createExcel = async () => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/export_users_excel' : '/api/vote/export_users_excel';
         const res = await fetch(apiPath);
+        if (res.status === 422) {
+            router.push("/auth")
+        }
         if (res.status === 200) {
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
