@@ -3,6 +3,7 @@ import type { Viewport } from 'next';
 import { PublicEnvScript } from 'next-runtime-env';
 import localFont from 'next/font/local';
 import { Suspense } from 'react';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 const SFPro = localFont({
@@ -50,6 +51,7 @@ export default function RootLayout({
                 <Suspense>
                     {children}
                 </Suspense>
+                <Toaster />
             </body>
         </html>
     );
