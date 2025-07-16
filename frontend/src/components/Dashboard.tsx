@@ -17,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { SelectExt } from './ui/select-ext';
 import { ToggleExt } from './ui/toggle-ext';
 
-async function fetchTableData(controller: AbortController, router: any) {
+async function fetchTableData(controller: AbortController) {
     const NEXT_PUBLIC_ENV = env('NEXT_PUBLIC_ENV');
     const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/all_user' : '/api/vote/all_user';
     try {
@@ -25,7 +25,7 @@ async function fetchTableData(controller: AbortController, router: any) {
             signal: controller.signal,
         });
         if (res.status === 422) {
-            router.push('/auth');
+            window.location.href = '/auth';
         }
         const data = await res.json();
         return data;
@@ -107,11 +107,11 @@ export function Dashboard() {
     useEffect(() => {
         const controller = new AbortController();
         (async () => {
-            const data = await fetchTableData(controller, router);
+            const data = await fetchTableData(controller);
             setTableData(data);
         })();
         return () => controller.abort('');
-    }, [router]);
+    }, []);
 
     const onRemove = async (voteId: number) => {
         const apiPath = NEXT_PUBLIC_ENV === 'dev' ? 'http://localhost/api/vote/update_user' : '/api/vote/update_user';
@@ -133,7 +133,7 @@ export function Dashboard() {
             if (res.status === 200) {
                 toast.success('Данные успешно обновлены');
                 const controller = new AbortController();
-                const data = await fetchTableData(controller, router);
+                const data = await fetchTableData(controller);
                 setTableData(data);
             } else {
                 console.error(data);
