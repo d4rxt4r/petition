@@ -48,7 +48,7 @@ export function VoteForm() {
     const handleCaptchaReset = () => setResetCaptcha((prev) => prev + 1);
 
     const [confirmedPhone, setConfirmedPhone] = useState('');
-    const [showConfirmation, setShowConfirmation] = useState(true);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const onSubmit = async (values: VoteFormData) => {
         const apiPath
